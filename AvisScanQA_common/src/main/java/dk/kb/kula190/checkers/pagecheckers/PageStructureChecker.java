@@ -1,7 +1,6 @@
 package dk.kb.kula190.checkers.pagecheckers;
 
 import dk.kb.kula190.ResultCollector;
-import dk.kb.kula190.checkers.batchcheckers.MetsSplitter;
 import dk.kb.kula190.generated.FailureType;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedAttributeParsingEvent;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedEventHandler;
@@ -70,21 +69,5 @@ public class PageStructureChecker extends DecoratedEventHandler {
                          String section,
                          Integer pageNumber) throws IOException {
         types.get().add("TIFF");
-    }
-    
-    @Override
-    public void injectedFile(DecoratedAttributeParsingEvent decoratedEvent,
-                             String injectedType,
-                             String newspaper,
-                             LocalDate editionDate,
-                             String edition,
-                             String section,
-                             Integer pageNumber) throws IOException {
-        
-        switch (injectedType) {
-            case MetsSplitter.INJECTED_TYPE_MIX -> { //MIX FROM METS FILE
-                types.get().add("MIX/METS");
-            }
-        }
     }
 }

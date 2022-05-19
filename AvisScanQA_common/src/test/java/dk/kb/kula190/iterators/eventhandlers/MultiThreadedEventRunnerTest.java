@@ -4,8 +4,6 @@ import dk.kb.kula190.Batch;
 import dk.kb.kula190.DecoratedRunnableComponent;
 import dk.kb.kula190.MultiThreadedRunnableComponent;
 import dk.kb.kula190.ResultCollector;
-import dk.kb.kula190.checkers.batchcheckers.MetsChecker;
-import dk.kb.kula190.checkers.batchcheckers.MetsSplitter;
 import dk.kb.kula190.checkers.filecheckers.XmlSchemaChecker;
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +36,6 @@ class MultiThreadedEventRunnerTest {
                         // new TiffAnalyzerImageMagick(resultCollector),
                         // new TiffCheckerImageMagick(resultCollector)
                         //
-                        new MetsSplitter(
-                                resultCollector),
-                        new MetsChecker(resultCollector),
                         
                         //Per file- checkers
                         new XmlSchemaChecker(resultCollector)

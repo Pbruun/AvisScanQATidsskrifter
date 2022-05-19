@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URISyntaxException;
 import java.util.List;
 
 
@@ -22,7 +21,7 @@ public class SimpleIteratorForFilesystemsTest extends AbstractTests {
     public TreeIterator getIterator() throws IOException {
         if (iterator == null) {
             //File file = new File(Thread.currentThread().getContextClassLoader().getResource("batch").toURI());
-            File file = new File(System.getenv("HOME")+"/Projects/AvisScanQA/data/orig/modersmaalet_19060701_19061231_RT1");
+            File file = new File(System.getenv("HOME")+"/Projects/AvisScanQA/data/dl_20220409_rt1/aarhusstiftstidende/pages");
             
             System.out.println(file);
             iterator = new TransparintingFileSystemIterator(file,

@@ -1,6 +1,5 @@
 package dk.kb.kula190;
 
-import dk.kb.kula190.checkers.filecheckers.tiff.TiffAnalyzerExiv2;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

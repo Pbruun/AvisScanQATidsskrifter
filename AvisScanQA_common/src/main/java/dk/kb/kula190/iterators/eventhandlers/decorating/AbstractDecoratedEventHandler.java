@@ -10,6 +10,9 @@ import dk.kb.kula190.iterators.common.NodeParsingEvent;
 import dk.kb.kula190.iterators.common.ParsingEvent;
 import dk.kb.kula190.iterators.eventhandlers.DefaultTreeEventHandler;
 import dk.kb.kula190.iterators.eventhandlers.EventHandlerUtils;
+import org.verapdf.core.EncryptedPdfException;
+import org.verapdf.core.ModelParsingException;
+import org.verapdf.core.ValidationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -203,6 +206,8 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
             }
         } catch (IOException e) {
             addExceptionalFailure(event, e);
+        } catch (EncryptedPdfException | ValidationException | ModelParsingException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -369,7 +374,8 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                  LocalDate editionDate,
                                  String udgave,
                                  String sectionName,
-                                 Integer pageNumber) throws IOException;
+                                 Integer pageNumber)
+            throws IOException, ValidationException, EncryptedPdfException, ModelParsingException;
 
     public abstract void injectedFile(DecoratedAttributeParsingEvent decoratedEvent,
                                       String injectedType,

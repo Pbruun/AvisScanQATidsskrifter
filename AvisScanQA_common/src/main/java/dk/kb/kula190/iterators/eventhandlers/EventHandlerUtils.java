@@ -15,10 +15,9 @@ import java.time.temporal.ChronoField;
 import java.util.Set;
 
 import static org.apache.commons.io.FilenameUtils.getName;
-import static org.apache.commons.io.FilenameUtils.isExtension;
 
 public class EventHandlerUtils {
-    public static final DateTimeFormatter dateFormatter =
+    public static final  DateTimeFormatter dateFormatter =
             new DateTimeFormatterBuilder().appendValue(ChronoField.YEAR, 4)
                                           .appendValue(ChronoField.MONTH_OF_YEAR, 2)
                                           .appendValue(ChronoField.DAY_OF_MONTH, 2)

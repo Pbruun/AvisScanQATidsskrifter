@@ -1,9 +1,9 @@
 package dk.kb.kula190.iterators.eventhandlers.decorating;
 
 import dk.kb.kula190.ResultCollector;
-import dk.kb.kula190.iterators.common.ParsingEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.verapdf.core.EncryptedPdfException;
+import org.verapdf.core.ModelParsingException;
+import org.verapdf.core.ValidationException;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -155,7 +155,8 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                         LocalDate editionDate,
                         String edition,
                         String section,
-                        Integer pageNumber) throws IOException {
+                        Integer pageNumber)
+            throws IOException, ValidationException, EncryptedPdfException, ModelParsingException {
         
     }
     

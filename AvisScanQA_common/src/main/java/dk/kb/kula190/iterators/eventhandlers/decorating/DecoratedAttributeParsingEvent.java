@@ -6,9 +6,6 @@ import dk.kb.kula190.iterators.eventhandlers.EventHandlerUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.apache.commons.io.FilenameUtils.isExtension;
 
 public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implements DecoratedParsingEvent {
     
@@ -37,44 +34,39 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
         Integer pageNumber = null;
     
         String batch;
-        if (lastName.matches(".*_RT\\d+$")) {
+        String[] splittedName = delegate.getName().split("/");
+        if (splittedName[2].equals("articles")) {
             //batchlike
             //batch: modersmaalet_19060701_19061231_RT1
             //mets/mods:  modersmaalet_19060701_19061231_RT1
-            batch = lastName;
+            batch = splittedName[0];
         } else { //page/section/edition-like
-            batch = EventHandlerUtils.firstName(delegate.getName());
+            batch = splittedName[0];
         
         
             //section: modersmaalet_19060706_udg01_1.sektion
             //edition: modersmaalet_19060706_udg01
             //page: modersmaalet_19060706_udg01_1.sektion_001
-            String[] splits = lastName.split("_", 5);
-            avis        = splits[0];
-            editionDate = LocalDate.parse(splits[1], EventHandlerUtils.dateFormatter);
-            udgave      = splits[2];
-            if (splits.length > 3) {
-                sectionName = splits[3];
-            }
-            if (splits.length > 4) {
-                pageNumber = Integer.parseInt(splits[4]);
-            }
+            String[] fileNameSplitted = splittedName[3].split("_");
+            sectionName = fileNameSplitted[2];
+            String[] page = fileNameSplitted[3].split("page");
+            pageNumber = Integer.parseInt(page[1]);
         }
-    
-    
-        String[] splits2 = batch.split("_", 4);
-        LocalDate startDate = LocalDate.parse(splits2[1], EventHandlerUtils.dateFormatter);
-        LocalDate endDate = LocalDate.parse(splits2[2], EventHandlerUtils.dateFormatter);
-        String avis2 = splits2[0];
-        String roundTrip = splits2[3].replaceFirst("^RT", "");
+
+        avis        = splittedName[1];
+        editionDate = LocalDate.parse(splittedName[0].split("_")[1], EventHandlerUtils.dateFormatter);
+
+        LocalDate startDate = editionDate;
+        LocalDate endDate = editionDate;
+        String roundTrip = splittedName[0].split("_")[2].replaceFirst("^rt", "");
     
         this.delegate    = delegate;
-        this.avis        = Optional.ofNullable(avis).orElse(avis2);
+        this.avis        = avis;
         this.roundTrip   = roundTrip;
         this.startDate   = startDate;
         this.endDate     = endDate;
         this.editionDate = editionDate;
-        this.udgave      = udgave;
+        this.udgave      = null;
         this.sectionName = sectionName;
         this.pageNumber  = pageNumber;
     }

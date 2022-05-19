@@ -29,8 +29,6 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <generatePackage>dk.kb.kula190.generated</generatePackage>
-
-
                             <schemaExcludes>
                                 <exclude>\.txt</exclude>
                                 <exclude>\.xjb</exclude>
@@ -38,16 +36,12 @@
                             <schemaDirectory>src/main/resources/</schemaDirectory>
                             <removeOldOutput>false</removeOldOutput>
                             <bindingDirectory>${basedir}/src/main/resources/</bindingDirectory>
-
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
-
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -121,7 +115,6 @@
             <artifactId>kb-util</artifactId>
         </dependency>
 
-
         <!--XML-->
         <!--Nessesary for jaxb-xml with java 11-->
         <!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
@@ -143,9 +136,26 @@
             <version>2.3.4</version>
             <scope>runtime</scope>
         </dependency>
-
         <!--XML end-->
-
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>core</artifactId>
+            <version>1.20.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>feature-reporting</artifactId>
+            <version>1.20.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>pdf-model</artifactId>
+            <version>1.20.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>validation-model</artifactId>
+            <version>1.20.1</version>
+        </dependency>
     </dependencies>
-
 </project>
