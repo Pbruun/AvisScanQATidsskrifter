@@ -4,6 +4,7 @@ import dk.kb.kula190.Batch;
 import dk.kb.kula190.DecoratedRunnableComponent;
 import dk.kb.kula190.ResultCollector;
 import dk.kb.kula190.checkers.batchcheckers.PDFAChecker;
+import dk.kb.kula190.checkers.batchcheckers.PageArticleChecker;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -14,7 +15,7 @@ class EventRunnerTest {
     
     private final File
             specificBatch
-            = new File(System.getenv("PROJECT") + "/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data/dl_20220409_rt1");
+            = new File(System.getenv("HOME") + "/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data/dl_20220409_rt1_short");
     
     
     @Test
@@ -29,7 +30,8 @@ class EventRunnerTest {
                         // new TiffAnalyzerExiv2(resultCollector),
                         // new TiffCheckerExiv2(resultCollector),
                         // new MetsChecker(resultCollector),
-                        new PDFAChecker(resultCollector)
+                        new PDFAChecker(resultCollector),
+                        new PageArticleChecker(resultCollector)
                         //Per file- checkers
 //                        new XmlSchemaChecker(resultCollector),
                         

@@ -19,5 +19,6 @@ public interface DecoratedParsingEvent {
     public String getSectionName();
     
     public Integer getPageNumber();
-    
+
+    public Boolean getArticle();
 }

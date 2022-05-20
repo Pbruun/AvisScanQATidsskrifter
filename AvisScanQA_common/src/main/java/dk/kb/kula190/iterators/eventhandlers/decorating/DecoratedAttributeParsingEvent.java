@@ -18,12 +18,11 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
     private final String udgave;
     private final String sectionName;
     private final Integer pageNumber;
+
+    private final Boolean article;
     
     public DecoratedAttributeParsingEvent(AttributeParsingEvent delegate) {
         super(delegate.getName(), delegate.getLocation());
-    
-        //modersmaalet_19060701_udg01_MODERSMAALETS Søndagsblad_0001.mix.xml
-        //modersmaalet_19060701_19061231_RT1.mods.xml
     
         final String lastName = EventHandlerUtils.removeExtension(EventHandlerUtils.lastName(delegate.getName()));
     
@@ -32,21 +31,14 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
         String udgave = null;
         String sectionName = null;
         Integer pageNumber = null;
+        Boolean article = false;
     
         String batch;
         String[] splittedName = delegate.getName().split("/");
         if (splittedName[2].equals("articles")) {
-            //batchlike
-            //batch: modersmaalet_19060701_19061231_RT1
-            //mets/mods:  modersmaalet_19060701_19061231_RT1
-            batch = splittedName[0];
+            article = true;
         } else { //page/section/edition-like
             batch = splittedName[0];
-        
-        
-            //section: modersmaalet_19060706_udg01_1.sektion
-            //edition: modersmaalet_19060706_udg01
-            //page: modersmaalet_19060706_udg01_1.sektion_001
             String[] fileNameSplitted = splittedName[3].split("_");
             sectionName = fileNameSplitted[2];
             String[] page = fileNameSplitted[3].split("page");
@@ -69,6 +61,7 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
         this.udgave      = null;
         this.sectionName = sectionName;
         this.pageNumber  = pageNumber;
+        this.article = article;
     }
     
     @Override
@@ -116,7 +109,11 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
     public Integer getPageNumber() {
         return pageNumber;
     }
-    
+
+    @Override
+    public Boolean getArticle(){
+        return article;
+    }
     @Override
     public String toString() {
         return "DecoratedAttributeParsingEvent{" +
@@ -130,7 +127,8 @@ public class DecoratedAttributeParsingEvent extends AttributeParsingEvent implem
                ", editionDate=" + editionDate +
                ", udgave='" + udgave + '\'' +
                ", sectionName='" + sectionName + '\'' +
-               ", pageNumber=" + pageNumber +
+               ", pageNumber=" + pageNumber + '\'' +
+               ", article=" + article +
                '}';
     }
 }

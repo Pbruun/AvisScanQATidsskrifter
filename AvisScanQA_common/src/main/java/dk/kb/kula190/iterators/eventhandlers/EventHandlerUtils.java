@@ -40,11 +40,7 @@ public class EventHandlerUtils {
     }
     
     public static String getExtension(String filename) {
-        if (Set.of("xml").contains(FilenameUtils.getExtension(filename))) {
-            return getExtension(FilenameUtils.removeExtension(filename));
-        } else {
-            return FilenameUtils.getExtension(filename);
-        }
+        return FilenameUtils.getExtension(filename);
     }
 
     public static Document handleDocument(DecoratedAttributeParsingEvent event) throws IOException {

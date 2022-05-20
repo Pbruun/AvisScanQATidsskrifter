@@ -200,6 +200,15 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                  decoratedEvent.getSectionName(),
                                  decoratedEvent.getPageNumber());
                 }
+                case "xml" ->{
+                    xmlFile(decoratedEvent,
+                            decoratedEvent.getAvis(),
+                            decoratedEvent.getEditionDate(),
+                            decoratedEvent.getUdgave(),
+                            decoratedEvent.getSectionName(),
+                            decoratedEvent.getPageNumber(),
+                            decoratedEvent.getArticle());
+                }
                 default -> addFailure(event,
                                       FailureType.UNKNOWN_FILETYPE_ERROR,
                                       "Encountered unexpected file");
@@ -384,5 +393,12 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                       String udgave,
                                       String sectionName,
                                       Integer pageNumber) throws IOException;
+
+    public abstract void xmlFile(DecoratedAttributeParsingEvent event,
+                                 String avis,
+                                 LocalDate editionDate,
+                                 String udgave,
+                                 String sectionName,
+                                 Integer pageNumber, Boolean article) throws IOException;
 
 }

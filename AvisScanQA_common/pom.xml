@@ -139,21 +139,6 @@
         <!--XML end-->
         <dependency>
             <groupId>org.verapdf</groupId>
-            <artifactId>core</artifactId>
-            <version>1.20.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.verapdf</groupId>
-            <artifactId>feature-reporting</artifactId>
-            <version>1.20.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.verapdf</groupId>
-            <artifactId>pdf-model</artifactId>
-            <version>1.20.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.verapdf</groupId>
             <artifactId>validation-model</artifactId>
             <version>1.20.1</version>
         </dependency>

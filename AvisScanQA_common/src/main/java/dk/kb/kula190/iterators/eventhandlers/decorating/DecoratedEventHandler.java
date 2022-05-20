@@ -170,4 +170,14 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                              Integer pageNumber) throws IOException {
         
     }
+
+    @Override
+    public void xmlFile(DecoratedAttributeParsingEvent event,
+                        String avis,
+                        LocalDate editionDate,
+                        String udgave,
+                        String sectionName,
+                        Integer pageNumber, Boolean article) throws IOException {
+
+    }
 }

@@ -183,6 +183,7 @@
             <xs:enumeration value="INVALID_TIFF_ERROR" />
             <xs:enumeration value="INVALID_MODS_ERROR" />
             <xs:enumeration value="INVALID_METS_ERROR"/>
+            <xs:enumeration value="INVALID_PDF_ERROR"/>
 
             <!--Unknown failures-->
             <xs:enumeration value="EXCEPTION" />
