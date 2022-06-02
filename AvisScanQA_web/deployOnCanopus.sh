@@ -9,8 +9,8 @@ set -x
 #9011: Tomcat http
 #9019: tomcat debug
 
-develServer=canopus.statsbiblioteket.dk
-user="avisscqa"
+develServer=AvisScanQATidsskrifter@localhost
+user="pabr"
 devel="$user@${develServer}"
 projectName=$(basename "$SCRIPT_DIR")
 projectBaseUrl=$projectName

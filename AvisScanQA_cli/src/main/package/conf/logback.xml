@@ -8,7 +8,7 @@
         </encoder>
     </appender>
 
-    <property name="LOGFILE" value="/home/avisscqa/AvisScanQA_cli/logs/AvisScanQA_cli.log"/>
+    <property name="LOGFILE" value="/home/pabr/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/AvisScanQA_cli/src/main/package/logs/AvisScanQA_cli.log"/>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGFILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

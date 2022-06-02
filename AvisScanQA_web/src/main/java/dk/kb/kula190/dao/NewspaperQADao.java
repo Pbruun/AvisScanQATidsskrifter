@@ -3,18 +3,13 @@ package dk.kb.kula190.dao;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import dk.kb.kula190.model.*;
 import dk.kb.kula190.webservice.exception.NotFoundServiceException;
-import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -140,7 +135,7 @@ public class NewspaperQADao {
 
         //Get all distinct newspaperIDs
         try (Connection conn = connectionPool.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT distinct(avisid) FROM batch")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT distinct(avisid) FROM newspaperarchive")) {
                 try (ResultSet res = ps.executeQuery()) {
                     while (res.next()) {
                         String avisID = res.getString(1);

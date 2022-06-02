@@ -15,7 +15,7 @@ class EventRunnerTest {
     
     private final File
             specificBatch
-            = new File(System.getenv("HOME") + "/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data/dl_20220409_rt1_short");
+            = new File(System.getenv("HOME") + "/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data/dl_20220301_rt1_short");
     
     
     @Test

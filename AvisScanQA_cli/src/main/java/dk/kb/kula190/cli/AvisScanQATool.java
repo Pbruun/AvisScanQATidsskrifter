@@ -1,10 +1,11 @@
 package dk.kb.kula190.cli;
 
 import dk.kb.kula190.*;
+import dk.kb.kula190.checkers.batchcheckers.PDFAChecker;
+import dk.kb.kula190.checkers.batchcheckers.PageArticleChecker;
 import dk.kb.kula190.checkers.filecheckers.ChecksumChecker;
 import dk.kb.kula190.checkers.filecheckers.FileNamingChecker;
 import dk.kb.kula190.checkers.filecheckers.ProgressLogger;
-import dk.kb.kula190.checkers.filecheckers.XmlSchemaChecker;
 import dk.kb.kula190.generated.Failure;
 import dk.kb.kula190.iterators.eventhandlers.TreeEventHandler;
 import dk.kb.util.yaml.YAML;
@@ -81,18 +82,18 @@ public class AvisScanQATool {
 
             Properties emailConfig;
 
-            emailConfig = dk.kb.util.yaml.YAMLUtils.toProperties(config.getSubMap("mail.smtp", true));
-            EmailSender.newInstance()
-                       .to(config.getString("mail.to"))
-                       .from(config.getString("mail.from"))
-                       .cc(config.getString("mail.cc"))
-                       .bcc(config.getString("mail.bcc"))
-                       .subject(config.getString("mail.subject"))
-                       .bodyText(config.getString("mail.bodyText") +
-                                 " <a href='" + config.getString("mail.URL") + batch + "'>" + batch + "</a>",
-                                 "text/html")
-                       //.attachment(Path.of(config.getString("mail.attachment")))
-                       .send(emailConfig);
+//            emailConfig = dk.kb.util.yaml.YAMLUtils.toProperties(config.getSubMap("mail.smtp", true));
+//            EmailSender.newInstance()
+//                       .to(config.getString("mail.to"))
+//                       .from(config.getString("mail.from"))
+//                       .cc(config.getString("mail.cc"))
+//                       .bcc(config.getString("mail.bcc"))
+//                       .subject(config.getString("mail.subject"))
+//                       .bodyText(config.getString("mail.bodyText") +
+//                                 " <a href='" + config.getString("mail.URL") + batch + "'>" + batch + "</a>",
+//                                 "text/html")
+//                       //.attachment(Path.of(config.getString("mail.attachment")))
+//                       .send(emailConfig);
 
         }
 
@@ -127,8 +128,9 @@ public class AvisScanQATool {
                 //BatchCheckers
 
                 //FileCheckers
-                new ChecksumChecker(resultCollector), new XmlSchemaChecker(resultCollector),
-
+                new ChecksumChecker(resultCollector),
+                new PageArticleChecker(resultCollector),
+                new PDFAChecker(resultCollector),
 
                 new ProgressLogger(resultCollector));
     }

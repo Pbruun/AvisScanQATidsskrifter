@@ -40,9 +40,7 @@ public class DecoratedNodeParsingEvent extends NodeParsingEvent implements Decor
         LocalDate startDate = editionDate;
         LocalDate endDate = editionDate;
         avis = null;
-        String roundTrip = splits[2];
-
-
+        String roundTrip = splits[2].replaceFirst("^rt","");
 
         this.avis        = avis;
         this.roundTrip   = roundTrip;

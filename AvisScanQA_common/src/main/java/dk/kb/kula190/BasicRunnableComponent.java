@@ -60,7 +60,6 @@ public class BasicRunnableComponent {
     
     
     protected TreeIterator getIterator(Path pathname) throws IOException {
-        
         File specificBatch = pathname.toFile();
         TreeIterator iterator = new SimpleIteratorForFilesystems(specificBatch,
                                                                  //How to adapt the filename for the checksum extension below

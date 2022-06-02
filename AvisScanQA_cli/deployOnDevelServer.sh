@@ -3,7 +3,7 @@
 SCRIPT_DIR=$(dirname "$(readlink -f -- ${BASH_SOURCE[0]})")
 
 projectName=$(basename "$SCRIPT_DIR")
-develServer=avisscqa@canopus.statsbiblioteket.dk
+develServer=AvisScanQATidsskrifter@localhost
 
 
 

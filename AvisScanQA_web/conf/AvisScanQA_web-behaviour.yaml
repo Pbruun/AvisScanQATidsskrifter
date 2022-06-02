@@ -9,8 +9,8 @@
 #
 #
 avischk-web-qa:
-  jdbc-connection-string: "jdbc:postgresql://canopus.statsbiblioteket.dk:5432/avisscqa-devel"
-  jdbc-user: "avisscqa"
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-user: "pabr"
   jdbc-password: "DO NOT SET HERE"
   jdbc-driver: "org.postgresql.Driver"
 

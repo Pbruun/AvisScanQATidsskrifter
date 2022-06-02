@@ -23,6 +23,8 @@ public class PageXML {
     private Set<String> articles;
     private String sectionName;
     private Integer sectionNumber;
+    private String source;
+    private Integer publishDate;
 
     public PageXML(DecoratedAttributeParsingEvent event,
                    String newspaper,
@@ -50,6 +52,8 @@ public class PageXML {
         }
         sectionNumber = xpath.selectInteger(metadata,"/pdfinfo/positional/sectionnumber");
         sectionName = xpath.selectString(metadata,"/pdfinfo/positional/sectionname");
+        source = xpath.selectString(metadata,"/pdfinfo/publishing/source");
+        publishDate = xpath.selectInteger(metadata,"/pdfinfo/publishing/publishdate");
     }
 
     public DecoratedAttributeParsingEvent getEvent() {
@@ -130,5 +134,13 @@ public class PageXML {
 
     public void setSectionNumber(Integer sectionNumber) {
         this.sectionNumber = sectionNumber;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public Integer getPublishDate() {
+        return publishDate;
     }
 }

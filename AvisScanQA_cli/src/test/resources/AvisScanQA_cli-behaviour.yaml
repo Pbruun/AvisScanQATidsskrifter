@@ -12,8 +12,8 @@
 
 jdbc:
   enabled: true
-  jdbc-connection-string: "jdbc:postgresql://canopus.statsbiblioteket.dk:5432/avisscqa-devel"
-  jdbc-user: "avisscqa"
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-user: "pabr"
   jdbc-password: ""
 
 states:

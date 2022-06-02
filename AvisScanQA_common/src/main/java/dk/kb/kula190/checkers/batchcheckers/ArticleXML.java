@@ -25,6 +25,9 @@ public class ArticleXML {
 
     private String fileName;
 
+    private String source;
+
+    private Integer publishDate;
 
     public ArticleXML(DecoratedAttributeParsingEvent event,
                       String newspaper,
@@ -44,6 +47,8 @@ public class ArticleXML {
         sectionNumber = xpath.selectInteger(metadata,"/article/metadata/pages/page/sectionnumber");
         sectionName = xpath.selectString(metadata,"/article/metadata/pages/page/sectionname");
         pageFile = xpath.selectString(metadata,"/article/metadata/pages/page/pagefile");
+        source = xpath.selectString(metadata,"/article/metadata/source");
+        publishDate = xpath.selectInteger(metadata,"/article/metadata/publishdate");
 
     }
     public void setEditionDate(LocalDate editionDate) {
@@ -111,4 +116,11 @@ public class ArticleXML {
         return event;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public Integer getPublishDate() {
+        return publishDate;
+    }
 }

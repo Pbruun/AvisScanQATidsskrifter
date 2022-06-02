@@ -12,9 +12,9 @@
 
 jdbc:
   enabled: true
-  jdbc-connection-string: "jdbc:postgresql://canopus.statsbiblioteket.dk:5432/avisscqa-devel"
-  jdbc-user: "avisscqa"
-  jdbc-password: ""
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-user: "pabr"
+  jdbc-password: "admin"
 
 states:
   initial-batch-state: "1IN_PROGRESS" #vigtigt at batch states stemmer overens med config i web delen

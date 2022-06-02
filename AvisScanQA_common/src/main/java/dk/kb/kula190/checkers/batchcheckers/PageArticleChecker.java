@@ -8,10 +8,7 @@ import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedNodeParsingEven
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class PageArticleChecker extends DecoratedEventHandler {
 
@@ -36,10 +33,10 @@ public class PageArticleChecker extends DecoratedEventHandler {
             throws IOException {
         if (article) {
 //            articles.set(new ArticleXML(event,newspaper,editionDate));
-            articlesMap.put(event.getName(), new ArticleXML(event, newspaper, editionDate));
+            articlesMap.put(event.getName().split("/")[3], new ArticleXML(event, newspaper, editionDate));
         } else {
 //            pages.set(new PageXML(event,newspaper,editionDate,edition,section,pageNumber));
-            pagesMap.put(event.getName(), new PageXML(event, newspaper, editionDate, edition, section, pageNumber));
+            pagesMap.put(event.getName().split("/")[3], new PageXML(event, newspaper, editionDate, edition, section, pageNumber));
         }
 
     }
@@ -51,16 +48,25 @@ public class PageArticleChecker extends DecoratedEventHandler {
                           LocalDate startDate,
                           LocalDate endDate) {
         for (Map.Entry<String, PageXML> page : pagesMap.entrySet()) {
-            System.out.println(page.getValue().getArticles());
-            for (String a : page.getValue().getArticles().stream().filter(Objects::nonNull).toList()
-            ) {
-                ArticleXML article = articlesMap.get(a);
-                checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",article.getSectionNumber(),page.getValue().getSectionNumber());
-                checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",article.getSectionName(),page.getValue().getSectionName());
-                checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",article.getPageNumber(),page.getValue().getPageNumber());
-                checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",article.getPageFile(),page.getKey());
+            if(page.getValue().getArticles() != null){
+                List<String> arts = page.getValue().getArticles().stream().filter(Objects::nonNull).toList();
+                for (String a : arts) {
+                    ArticleXML article = articlesMap.get(a);
+                    Integer aSectionNr = article.getSectionNumber();
+                    Integer pSectionNr = page.getValue().getSectionNumber();
+                    String aSectionName = article.getSectionName();
+                    String pSectionName = page.getValue().getSectionName();
+                    String aSource = article.getSource();
+                    String pSource = page.getValue().getSource();
+                    Integer aPublish = article.getPublishDate();
+                    Integer pPublish = page.getValue().getPublishDate();
+                    checkEquals(event,
+                                FailureType.EXCEPTION, "{actual} should have been {expected}", aSectionNr, pSectionNr);
+                    checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",aSectionName,pSectionName);
+                    checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",aSource,pSource);
+                    checkEquals(event,FailureType.EXCEPTION,"{actual} should have been {expected}",aPublish,pPublish);
+                }
             }
-
         }
     }
 

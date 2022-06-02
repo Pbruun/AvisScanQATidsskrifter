@@ -8,7 +8,6 @@ import dk.kb.kula190.iterators.eventhandlers.DefaultTreeEventHandler;
 import dk.kb.kula190.iterators.eventhandlers.EventHandlerUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -39,56 +38,54 @@ public class FileNamingChecker extends DefaultTreeEventHandler {
                                                            .appendValue(ChronoField.DAY_OF_MONTH, 2)
                                                            .toFormatter();
     }
-    
+
     @Override
     public void handleNodeBegin(NodeBeginsParsingEvent event) {
-        
+
         String folderName = EventHandlerUtils.lastName(event.getName());
         if (batchName == null) {
             batchFolder = Path.of(event.getLocation() );
             batchName = folderName;
             final String[] batchNameSplits = batchName.split("_", 5);
-            newspaperName   = batchNameSplits[0];
-            fileNamePattern = Pattern.compile(Pattern.quote(newspaperName )+ "_(\\d{8})_udg\\d{2}_[^_]+_\\d{4}");
             batchStartDate = LocalDate.parse(batchNameSplits[1], localDateFormatter);
-            batchEndDate   = LocalDate.parse(batchNameSplits[2], localDateFormatter);
+            batchEndDate   = LocalDate.parse(batchNameSplits[1], localDateFormatter);
             return;
         }
-        
+
         String parentName = new File(event.getLocation()).getParentFile().getName();
-        
-        
-        checkEquals(event,
-                    FailureType.FILE_STRUCTURE_ERROR,
-                    "Appendix H – File structure: Parent dir {actual} should always be batch dir {expected}, i.e. only one level of " + "folders",
-                    parentName,
-                    batchName);
-        
-        
+
+
+//        checkEquals(event,
+//                    FailureType.FILE_STRUCTURE_ERROR,
+//                    "Appendix H – File structure: Parent dir {actual} should always be batch dir {expected}, i.e. only one level of " + "folders",
+//                    parentName,
+//                    batchName);
+
+
         //Only ALTO, METS, MIX, MODS, PDF, TIFF allowed here
-        checkInSet(event,
-                   FailureType.FILE_STRUCTURE_ERROR,
-                   "Appendix H – File structure: Folder name {0}/{actual} must be in one of {set}",
-                   folderName,
-                   Set.of("ALTO", "METS", "MIX", "MODS", "PDF", "TIFF"),
-                   batchFolder);
+//        checkInSet(event,
+//                   FailureType.FILE_STRUCTURE_ERROR,
+//                   "Appendix H – File structure: Folder name {0}/{actual} must be in one of {set}",
+//                   folderName,
+//                   Set.of("ALTO", "METS", "MIX", "MODS", "PDF", "TIFF"),
+//                   batchFolder);
     }
-    
-    @Override
-    public void handleAttribute(AttributeParsingEvent event) throws IOException {
-        final File file = new File(event.getLocation());
-        String fileName = file.getName();
-        File parent = file.getParentFile();
-        String parentName = file.getParentFile().getName();
-        
-        String extension = EventHandlerUtils.getExtension(fileName);
-        String nameWithoutExtension = EventHandlerUtils.removeExtension(fileName);
-        
-        checkExtensionMatchFolder(event, parent, extension);
-        checkNameMachPattern(event, extension, nameWithoutExtension);
-        
-    }
-    
+
+//    @Override
+//    public void handleAttribute(AttributeParsingEvent event) throws IOException {
+//        final File file = new File(event.getLocation());
+//        String fileName = file.getName();
+//        File parent = file.getParentFile();
+//        String parentName = file.getParentFile().getName();
+//
+//        String extension = EventHandlerUtils.getExtension(fileName);
+//        String nameWithoutExtension = EventHandlerUtils.removeExtension(fileName);
+//
+//        checkExtensionMatchFolder(event, parent, extension);
+//        checkNameMachPattern(event, extension, nameWithoutExtension);
+//
+//    }
+
     private void checkNameMachPattern(AttributeParsingEvent event, String extension, String nameWithoutExtension) {
         //modersmaalet_19060701_udg01_MODERSMAALETS Søndagsblad_0003.md5
         switch (extension) {
@@ -98,7 +95,7 @@ public class FileNamingChecker extends DefaultTreeEventHandler {
                                                nameWithoutExtension,
                                                batchName);
             case "mix", "pdf", "tif", "tiff", "alto" -> {
-                
+
                 Matcher matcher = checkRegExp(event,
                                               FailureType.FILE_STRUCTURE_ERROR,
                                               "Appendix B – File names: Page-file file {actual} must have same name as batch {expected}",
@@ -113,13 +110,13 @@ public class FileNamingChecker extends DefaultTreeEventHandler {
                                  batchEndDate,
                                  "Appendix B – File names: Page have date {actual} outside of batch date interval {requiredMin} - {requiredMax}");
                 }
-                
+
             }
             default -> addFailure(event, FailureType.FILE_STRUCTURE_ERROR,
                                   "Extension {0} is not expected here", extension);
         }
     }
-    
+
     private void checkExtensionMatchFolder(AttributeParsingEvent event, File parentName, String extension) {
         switch (parentName.getName()) {
             case "ALTO" -> checkInSet(event,

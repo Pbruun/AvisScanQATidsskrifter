@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -23,9 +22,9 @@ public class DaoBatchHelper {
         try (PreparedStatement ps = conn.prepareStatement(
                 "select * "
                 + "from batch b "
-                + "where avisid = ? and "
+                + "where "
                 + "b.lastmodified >= ALL(SELECT lastmodified FROM batch WHERE batchid=b.batchid)")) {
-            ps.setString(1, avisID);
+            //ps.setString(1, avisID);
 
             try (ResultSet res = ps.executeQuery()) {
                 while (res.next()) {
@@ -51,10 +50,9 @@ public class DaoBatchHelper {
                 """
                 SELECT DISTINCT(state)
                 FROM batch b
-                WHERE avisid = ? AND
-                      b.lastmodified >= ALL(SELECT lastmodified FROM batch WHERE batchid=b.batchid)
+                WHERE b.lastmodified >= ALL(SELECT lastmodified FROM batch WHERE batchid=b.batchid)
                 """)) {
-            ps.setString(1, avisID);
+            //ps.setString(1, avisID);
 
             try (ResultSet res = ps.executeQuery()) {
                 while (res.next()) {
@@ -71,9 +69,8 @@ public class DaoBatchHelper {
                 """
                 SELECT MAX(delivery_date) AS dDate
                 FROM batch
-                WHERE avisid = ?
                 """)) {
-            ps.setString(1, avisID);
+            //ps.setString(1, avisID);
 
             try (ResultSet res = ps.executeQuery()) {
                 while (res.next()) {
@@ -141,10 +138,10 @@ public class DaoBatchHelper {
 
     static void setBatchState(String batchID, String state, String username, Connection conn) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO batch(batchid, avisid, roundtrip, start_date, end_date, delivery_date, problems, state, " +
+                "INSERT INTO batch(batchid, roundtrip, start_date, end_date, delivery_date, problems, state, " +
                 "num_problems, username, lastmodified)  "
                 +
-                " ( SELECT batchid, avisid, roundtrip, start_date, end_date, delivery_date, problems, ?, " +
+                " ( SELECT batchid, roundtrip, start_date, end_date, delivery_date, problems, ?, " +
                 "num_problems, ?, now() "
                 +
                 " FROM batch "
@@ -172,7 +169,7 @@ public class DaoBatchHelper {
     private static Batch readBatch(Connection conn, ResultSet res) throws SQLException {
         String batchID = res.getString("batchid");
         return new Batch().batchid(batchID)
-                          .avisid(res.getString("avisid"))
+//                          .avisid(res.getString("avisid"))
                           .roundtrip(res.getInt("roundtrip"))
 
                           .notes(DaoNoteHelper.getBatchLevelNotes(batchID, conn))
@@ -194,7 +191,7 @@ public class DaoBatchHelper {
     private static SlimBatch readSlimBatch(Connection conn, ResultSet res) throws SQLException {
         String batchID = res.getString("batchid");
         return new SlimBatch().batchid(batchID)
-                              .avisid(res.getString("avisid"))
+//                              .avisid(res.getString("avisid"))
                               .roundtrip(res.getInt("roundtrip"))
 
                               // .notes(DaoNoteHelper.getBatchLevelNotes(batchID,conn))

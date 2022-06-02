@@ -17,17 +17,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.Driver;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 //Not multithreaded...
 public class DatabaseRegister extends DecoratedEventHandler {
@@ -106,7 +101,6 @@ public class DatabaseRegister extends DecoratedEventHandler {
         FileUtils.touch(ackFile.toFile());
         log.info("Finished handling of batch {} so wrote acknowledgmentFile {}", batchName.get(), ackFile);
     }
-
     private void updateBatchState(String newspaper,
                                   String roundTrip,
                                   LocalDate startDate,
@@ -118,7 +112,6 @@ public class DatabaseRegister extends DecoratedEventHandler {
         try (PreparedStatement preparedStatement = connection.prepareStatement("""
                                                                                INSERT INTO
                                                                                     batch(batchid,
-                                                                                          avisid,
                                                                                           roundtrip,
                                                                                           start_date,
                                                                                           end_date,
@@ -128,13 +121,13 @@ public class DatabaseRegister extends DecoratedEventHandler {
                                                                                           num_problems,
                                                                                           username,
                                                                                           lastmodified)
-                                                                               VALUES (?,?,?,?,?,?,?,?,?,?,now())
+                                                                               VALUES (?,?,?,?,?,?,?,?,?,now())
                                                                                """)) {
             int param = 1;
             //Batch ID
             preparedStatement.setString(param++, batchName.get());
             //Avis ID
-            preparedStatement.setString(param++, newspaper);
+//            preparedStatement.setString(param++, newspaper);
             // roundtrip
             preparedStatement.setInt(param++, Integer.parseInt(roundTrip));
             //start date
@@ -216,7 +209,7 @@ public class DatabaseRegister extends DecoratedEventHandler {
     }
 
     @Override
-    public void tiffFile(DecoratedAttributeParsingEvent event,
+    public void pdfFile(DecoratedAttributeParsingEvent event,
                          String newspaper,
                          LocalDate editionDate,
                          String edition,
@@ -242,7 +235,7 @@ public class DatabaseRegister extends DecoratedEventHandler {
                 preparedStatement.setString(param++,
                                             event.getLocation().substring(event.getLocation().indexOf(newspaper)));
                 //format_type
-                preparedStatement.setString(param++, "tiff");
+                preparedStatement.setString(param++, "pdf");
                 //edition_date
                 preparedStatement.setDate(param++, Date.valueOf(editionDate));
                 //single_page
