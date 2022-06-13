@@ -10,7 +10,7 @@
         <version>22</version>
     </parent>
     <groupId>dk.kb.kula190</groupId>
-    <artifactId>AvisScanQA</artifactId>
+    <artifactId>TidsskriftScanQA</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -34,9 +34,9 @@
     </properties>
 
     <modules>
-        <module>AvisScanQA_common</module>
-        <module>AvisScanQA_cli</module>
-        <module>AvisScanQA_web</module>
+        <module>TidsskriftScanQA_common</module>
+        <module>TidsskriftScanQA_cli</module>
+        <module>TidsskriftScanQA_web</module>
     </modules>
 
 

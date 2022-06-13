@@ -1,0 +1,41 @@
+<Context docBase="${user.home}/services/tomcat-apps/TidsskriftScanQA_web.war">
+
+    <Environment name="TidsskriftScanQA_web-logback-config"
+                 value="${user.home}/services/conf/logback.xml"
+                 type="java.lang.String"
+                 override="false"/>
+
+    <!-- Note that the application-config is defined using globbing: Multiple config files are merged -->
+    <Environment name="application-config"
+                 value="${user.home}/services/conf/AvisScanQA_web-*.yaml"
+                 type="java.lang.String"
+                 override="false"/>
+
+    <Parameter name="casServerLoginUrl"
+               value="https://intern-samlstage.statsbiblioteket.dk/module.php/sbcasserver/cas.php/login"
+               override="false"
+               description="The location of the CAS server login URL"/>
+    <Parameter name="casServerUrlPrefix"
+               value="https://intern-samlstage.statsbiblioteket.dk/module.php/sbcasserver/cas.php/"
+               override="false"
+               description="The start of the CAS server URL"/>
+    <Parameter name="serverName"
+               value="canopus.statsbiblioteket.dk:9631"
+               override="false"
+               description="The server name of the server this application is hosted on"/>
+    <!-- value="${hostname}:9631 gives an IllegalArgumentException on $ -->
+<!--
+
+
+    <Environment name="allowed_AD_groups"
+                 value="['CN=It-udvikling,OU=User groups,OU=Groups,OU=Accounts,DC=sb,DC=statsbiblioteket,DC=dk',
+                         'CN=it-drift,OU=User groups,OU=Groups,OU=Accounts,DC=sb,DC=statsbiblioteket,DC=dk',
+                         'CN=alma-label-ts-Stage,OU=alma-label-ts,OU=Adgangsstyring,DC=kb,DC=dk',
+                         'CN=alma-label-ts-Stage,OU=User groups,OU=Groups,OU=Accounts,DC=sb,DC=statsbiblioteket,DC=dk'
+                        ]"
+                 type="java.lang.String"
+                 override="false"
+                 description="JSON array of the groups that are allowed to use this application"/>
+-->
+
+</Context>

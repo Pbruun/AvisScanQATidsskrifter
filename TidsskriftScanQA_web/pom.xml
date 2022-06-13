@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dk.kb.kula190</groupId>
+        <artifactId>TidsskriftScanQA</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>TidsskriftScanQA_web</artifactId>
+    <packaging>war</packaging>
+
+    <properties>
+
+        <project.package>dk.kb.kula190</project.package>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>dk.kb.util</groupId>
+            <artifactId>kb-util</artifactId>
+        </dependency>
+
+        <!--Auth-->
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/org.jasig.cas.client/cas-client-integration-tomcat-v90 -->
+            <groupId>org.jasig.cas.client</groupId>
+            <artifactId>cas-client-integration-tomcat-v90</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/org.jasig.cas.client/cas-client-integration-jetty -->
+            <groupId>org.jasig.cas.client</groupId>
+            <artifactId>cas-client-integration-jetty</artifactId>
+            <version>3.6.4</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Apache CXF and servlet stuff -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>4.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- JSON processing: jackson -->
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider -->
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.jaxrs/jackson-jaxrs-xml-provider -->
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-xml-provider</artifactId>
+        </dependency>
+        <dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml -->
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>javax.activation</artifactId>
+                </exclusion>
+            </exclusions>
+
+        </dependency>
+        <dependency>
+            <!--For the openapi endpoint /openapi.json-->
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>javax.activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!--For the swagger UI endpoint /api-docs?url=openapi.json-->
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>3.52.5</version>
+        </dependency>
+
+        <!-- openapitools dependency -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.6.5</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jsr311-api</artifactId>
+                    <groupId>javax.ws.rs</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
+
+        <!-- Logging dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.35</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.7.35</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.35</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.7.35</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.10</version>
+        </dependency>
+
+
+        <!-- Database connection dependencies -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1211</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.4</version>
+        </dependency>
+
+        <!--For the standard unit test-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/openapi</directory>
+                <filtering>true</filtering>
+            </resource>
+            <!-- Needed as specifying <resources> overrides all previous definitions -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <!--This ensures that the openapi.yaml have been filtered and copied to target/classes
+                        BEFORE being used by the openapi generator above-->
+                        <phase>generate-sources</phase>
+                        <!--as both the openapi codegen and this execution happens at phase generate-sources, ensure
+                        this happens first by having this placed above codegen in the pom-->
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/jetty-res</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/jetty</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>5.4.0</version>
+                <configuration>
+                    <generatorName>jaxrs-cxf-extended</generatorName>
+                    <inputSpec>${project.build.outputDirectory}/openapi.yaml</inputSpec>
+                    <generateSupportingFiles>false</generateSupportingFiles>
+                    <generateApiTests>false</generateApiTests>
+                    <generateModelDocumentation>true</generateModelDocumentation>
+                    <generateApis>true</generateApis>
+                    <output>${project.basedir}</output>
+                    <templateDirectory>src/main/templates/</templateDirectory>
+
+                    <configOptions>
+                        <!--https://openapi-generator.tech/docs/generators/jaxrs-cxf-extended/-->
+                        <sourceFolder>target/generated-sources</sourceFolder>
+                        <useSwaggerFeature>true</useSwaggerFeature>
+                        <useSwaggerUI>true</useSwaggerUI>
+                        <apiPackage>${project.package}.api</apiPackage>
+                        <modelPackage>${project.package}.model</modelPackage>
+                        <implFolder>src/main/java</implFolder>
+                        <invokerPackage>${project.package}</invokerPackage>
+                        <dateLibrary>java8</dateLibrary>
+                    </configOptions>
+                    <packageName>${project.package}</packageName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- Generate API and Model-files from the OpenAPI specification (positioned under the target/generated-sources/ folder).
+                             These files are overwritten on all builds, so they should never be edited manually. -->
+                        <id>generate api classes</id>
+
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <ignoreFileOverride>
+                                ${project.basedir}/.openapi-codegen-ignore-api
+                            </ignoreFileOverride>
+
+                            <configOptions>
+                                <!-- Setting this to true overwrites existing implementations.
+                                     Only set it temporarily when creating a new project -->
+                                <generateOperationBody>false</generateOperationBody>
+                            </configOptions>
+
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <!-- The purpose it to generate skeleton implementation classes, if such classes are not already existing.
+                         Since we always want to overwrite existing api & model-files when the OpenAPI specification is changed,
+                         but never want to overwrite existing implementation-files, we need to do the generation in 2 steps. -->
+
+                        <id>generate skeleton impl</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <ignoreFileOverride>
+                                ${project.basedir}/.openapi-codegen-ignore-impl
+                            </ignoreFileOverride>
+
+                            <configOptions>
+                                <generateOperationBody>true</generateOperationBody>
+                            </configOptions>
+
+                            <skipOverwrite>true</skipOverwrite>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate openapi.json</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatorName>openapi</generatorName>
+                            <output>${project.build.outputDirectory}</output>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate javascript classes</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <ignoreFileOverride>
+                                ${project.basedir}/.openapi-codegen-ignore-impl
+                            </ignoreFileOverride>
+                            <generatorName>javascript</generatorName>
+                            <templateDirectory>src/main/templates/javascript</templateDirectory>
+                            <generateModels>true</generateModels>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <generateApis>false</generateApis>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateAliasAsModel>false</generateAliasAsModel>
+                            <configOptions>
+                                <sourceFolder>target/generated-sources-javascript</sourceFolder>
+                                <invokerPackage>${project.artifactId}</invokerPackage>
+                                <modelPackage>model</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>${project.artifactId}</warName>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Used only for mvn jetty:run jetty:run-war -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>10.0.7</version>
+                <configuration>
+                    <useTestScope>true</useTestScope>
+
+                    <webApp>
+
+                        <contextPath>/${project.artifactId}/</contextPath>
+                        <descriptor>${project.build.finalName}/WEB-INF/web.xml</descriptor>
+                        <jettyEnvXml>${project.build.directory}/jetty-res/jetty-env.xml</jettyEnvXml>
+                    </webApp>
+                </configuration>
+            </plugin>
+
+            <!-- New maven-assembly plugin  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>distributions</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

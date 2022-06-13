@@ -20,8 +20,8 @@ rm -f checksums.txt
 
 # Generate new checksums.txt file
 find ./ \
-    -type f -o -type l \
-    -not -name 'checksums.txt' \
+    \( -type f -o -type l \
+    -not -name 'checksums.txt' \) \
     -print0  | \
   sed -e 's/^/\x0/' \
       -e 's|\x0\./|\x0|g' \

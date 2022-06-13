@@ -1,0 +1,137 @@
+#
+# This config contains behaviour data: Thread allocation, allowed fields for lookup, limits for arguments etc.
+#
+# The behaviour config is normally controlled by developers and is part of the code repository.
+# Sensitive information such as machine names and user/passwords should not be part of this config.
+#
+# It will be automatically merged with the environment config when accessed through the
+# application config system.
+#
+#
+avischk-web-qa:
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-user: "pabr"
+  jdbc-password: "DO NOT SET HERE"
+  jdbc-driver: "org.postgresql.Driver"
+
+  batchesFolder: "/home/pabr/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data"
+
+  predefinedNotes:
+    dayNotes:
+      - "Udkom ikke pga. strejke"
+    editionNotes:
+      - "Edition dropdown note"
+    pageNotes:
+      - "Siden er ikke god?"
+
+  http-content-base-string: ""
+  image-content-base-string: ""
+  iipsrv-base-string: ""
+
+
+  webserviceConfig:
+    global:
+      calendarStyling:
+        default:
+          color: "white"
+          backgroundColor: "#28a745"
+          borderColor: "#28a745"
+        error:
+          color: "white"
+          backgroundColor: "rgb(237 43 43)"
+          borderColor: "rgb(237 43 43)"
+        notWithinBatch:
+          color: "black"
+          backgroundColor: "#f8f9fa"
+          borderColor: "#f8f9fa"
+        noPageWithin:
+          color: "white"
+          backgroundColor: "#6c757d"
+          borderColor: "#6c757d"
+        containsNotes:
+          color: "yellow"
+          fontWeight: "bold"
+    newspaper:
+      dropDownStandardMessages:
+        options:
+          - "Avis ugyldig"
+    batch:
+      dropDownStandardMessages:
+        options:
+          - "Batch ugyldigt"
+      stateButtonOptions:
+        APPROVED:
+          name: "Accepted"
+          description: "The batch contains no or acceptable errors"
+          styling:
+            backgroundColor: "#1e7e34"
+            borderColor: "#1e7e34"
+          calendarStyling:
+            box-shadow: "0px -3px  1px 1px #0053f2"
+        REJECTED:
+          name: "Rejected"
+          description: "The batch contains contains errors, that a new roundtrip is needed"
+          styling:
+            backgroundColor: "#cf1d1d"
+            borderColor: "#cf1d1d"
+          calenderStyling:
+            color: "white"
+            backgroundColor: "#28a745"
+            borderColor: "#28a745"
+        1IN_PROGRESS:
+          name: "Received, not checked"
+          description: "The batch has yet to go through the automated checkers"
+          styling:
+            backgroundColor: "#007bff"
+            borderColor: "#007bff"
+          calendarStyling:
+            color: "white"
+            backgroundColor: "#28a745"
+            borderColor: "#28a745"
+        2IN_PROGRESS:
+          name: "Checked"
+          description: "The batch has gone through automated checkers"
+          styling:
+            backgroundColor: "#007bff"
+            borderColor: "#007bff"
+          calendarStyling:
+            color: "white"
+            backgroundColor: "#28a745"
+            borderColor: "#28a745"
+        3IN_PROGRESS:
+          name: "Missing Dates Verified"
+          description: "The batch has gone through automated checkers"
+          styling:
+            backgroundColor: "#007bff"
+            borderColor: "#007bff"
+          calendarStyling:
+            color: "white"
+            backgroundColor: "#28a745"
+            borderColor: "#28a745"
+        4IN_PROGRESS:
+          name: "OCR verified"
+          description: "The batch has gone through automated checkers"
+          styling:
+            backgroundColor: "#007bff"
+            borderColor: "#007bff"
+          calendarStyling:
+            color: "white"
+            backgroundColor: "#28a745"
+            borderColor: "#28a745"
+
+    edition:
+      dropDownStandardMessage:
+        dayDropDown:
+          options:
+            - "Udkom ikke pgr. af strejke"
+            - "Udkom ikke pgr. af særlig lejlighed"
+            - "Udgivelsen haves ikke"
+        udgDropDown:
+          options:
+            - "Ugyldig edition"
+        sectionDropDown:
+          options:
+            - "Ugyldig section"
+        pageDropDown:
+          options:
+            - "Utydelig side"
