@@ -135,13 +135,12 @@ public class DaoBatchHelper {
         return null;
     }
     static List<SlimBatch> getAllBatches(Connection conn) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT *, na.avisid "
+        try (PreparedStatement ps = conn.prepareStatement("SELECT *"
                                                           +
-                                                          " FROM batch b1, newspaperarchive na"
+                                                          " FROM batch b1"
                                                           +
                                                           " WHERE lastmodified >= ALL(SELECT lastmodified FROM batch " +
-                                                          "b2 WHERE b1.batchid = b2.batchid)" +
-                                                          " AND b1.batchid = na.batchid")) {
+                                                          "b2 WHERE b1.batchid = b2.batchid)")) {
             List<SlimBatch> list = new ArrayList<>();
             try (ResultSet res = ps.executeQuery()) {
 

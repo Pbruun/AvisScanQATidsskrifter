@@ -233,7 +233,7 @@ function renderBatchTable(filter) {
     let $table = $("#batchOverview-table");
 
     $table.bootstrapTable({
-        url: "api/batch",
+        //url: "api/batch",
         filterControl: true,
         detailView: true,
         detailFormatter: function (i, r) {
