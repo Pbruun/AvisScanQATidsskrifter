@@ -1,12 +1,14 @@
 package dk.kb.kula190;
 
 import dk.kb.kula190.generated.Failure;
+import dk.kb.kula190.generated.FailureType;
 import dk.kb.kula190.generated.Reference;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedAttributeParsingEvent;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedEventHandler;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedNodeParsingEvent;
 import dk.kb.kula190.iterators.eventhandlers.decorating.DecoratedParsingEvent;
 import dk.kb.util.json.JSON;
+import dk.kb.util.yaml.YAML;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.CaseUtils;
@@ -15,14 +17,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.sql.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 //Not multithreaded...
 public class DatabaseRegister extends DecoratedEventHandler {
@@ -101,6 +103,7 @@ public class DatabaseRegister extends DecoratedEventHandler {
         FileUtils.touch(ackFile.toFile());
         log.info("Finished handling of batch {} so wrote acknowledgmentFile {}", batchName.get(), ackFile);
     }
+
     private void updateBatchState(String newspaper,
                                   String roundTrip,
                                   LocalDate startDate,
@@ -156,7 +159,7 @@ public class DatabaseRegister extends DecoratedEventHandler {
                           String roundTrip,
                           LocalDate startDate,
                           LocalDate endDate) throws IOException {
-
+        newspaperFolder(event, newspaper);
         try (Connection connection = dataSource.getConnection()) {
 
             List<Failure> batchFailures = new ArrayList<>(checkerFailures);
@@ -190,9 +193,9 @@ public class DatabaseRegister extends DecoratedEventHandler {
             }
         }
     }
-    
+
     private String orEmpty(List<?> batchFailures) {
-        if (batchFailures.isEmpty()){
+        if (batchFailures.isEmpty()) {
             return "";
         }
         return JSON.toJson(batchFailures, true);
@@ -210,11 +213,11 @@ public class DatabaseRegister extends DecoratedEventHandler {
 
     @Override
     public void pdfFile(DecoratedAttributeParsingEvent event,
-                         String newspaper,
-                         LocalDate editionDate,
-                         String edition,
-                         String section,
-                         Integer pageNumber) throws IOException {
+                        String newspaper,
+                        LocalDate editionDate,
+                        String edition,
+                        String section,
+                        Integer pageNumber) throws IOException {
         List<Failure> failuresForThisPage = checkerFailures.stream()
                                                            .filter(failure -> matchThisPage(failure.getReference(),
                                                                                             event))
@@ -271,6 +274,138 @@ public class DatabaseRegister extends DecoratedEventHandler {
 
         } catch (SQLException e) {
             throw new IOException("Failure in registering page " + event + " for batch " + batchName.get(), e);
+        }
+    }
+
+    @Override
+    public void newspaperFolder(DecoratedNodeParsingEvent event,
+                                String avis) throws IOException {
+        File path = new File(event.getLocation());
+        File[] newspapers = path.listFiles((dir, name) -> new File(dir, name).isDirectory());
+        if (newspapers != null) {
+            for (File newspaper : newspapers) {
+                File[] files = newspaper.listFiles((dir, name) -> new File(dir, name).isDirectory());
+                assert files != null;
+                long newspaperSize = files[0].length();
+                DayOfWeek dayOfWeek = DayOfWeek.from(event.getEditionDate());
+                if (newspaperSize > 0) {
+
+                    int[] daysOfWeek = {0, 0, 0, 0, 0, 0, 0};
+                    daysOfWeek[dayOfWeek.getValue() - 1] += 1;
+                    try (Connection connection = dataSource.getConnection()) {
+
+                        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                                """
+                                INSERT INTO deliverypattern (avisid,monday,tuesday,wednesday,thursday,friday,saturday,sunday,batchcount) 
+                                VALUES(?,?,?,?,?,?,?,?,1)
+                                ON CONFLICT (avisid) 
+                                DO 
+                                UPDATE  
+                                SET monday = deliverypattern.monday + ?,tuesday = deliverypattern.tuesday + ?, wednesday = deliverypattern.wednesday + ?, thursday = deliverypattern.thursday + ?, friday = deliverypattern.friday + ?, saturday = deliverypattern.saturday + ?, sunday = deliverypattern.sunday +?, batchcount = deliverypattern.batchcount + 1
+                                WHERE deliverypattern.avisid = ?
+                                """)) {
+                            int param = 1;
+                            //orig_relpath
+                            preparedStatement.setString(param++, newspaper.getName());
+                            for (int j : daysOfWeek) {
+                                preparedStatement.setInt(param++, j);
+                            }
+
+                            for (int j : daysOfWeek) {
+                                preparedStatement.setInt(param++, j);
+                            }
+                            preparedStatement.setString(param++, newspaper.getName());
+                            preparedStatement.execute();
+
+                        }
+                        connection.commit();
+                        checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, true);
+                    } catch (SQLException e) {
+                        throw new IOException("Failure in registering page " +
+                                              event +
+                                              " for batch " +
+                                              newspaper.getName(), e);
+                    }
+
+
+                } else {
+                    checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, false);
+                }
+            }
+
+
+        }
+        checkExpectedDeliveries(event, newspapers);
+
+
+    }
+
+    private void checkDeliveryFrequency(DecoratedNodeParsingEvent event,
+                                        String newspaper, DayOfWeek date, Boolean hasPages) {
+        Double frequency;
+        int batchCount;
+        int day;
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    """
+                    SELECT * FROM deliverypattern WHERE avisid = ?
+                    """)) {
+                int param = 1;
+                preparedStatement.setString(param++, newspaper);
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    while (res.next()) {
+                        day = res.getInt(date.getValue() + 1);
+                        batchCount = res.getInt("batchcount");
+
+                        if (batchCount > 10) {
+                            frequency = day / (double) batchCount;
+                            if (!hasPages) {
+                                checkWithinRange(event,
+                                                 FailureType.DELIVERY_PATTERN_ERROR,
+                                                 frequency,
+                                                 0.0,
+                                                 0.7,
+                                                 "Newspaper usually has a release on this date");
+                            } else {
+                                checkAtLeast(event,
+                                             FailureType.DELIVERY_PATTERN_ERROR,
+                                             frequency,
+                                             0.12,
+                                             "Newspaper release was outside the standard delivery pattern.");
+                            }
+
+                        }
+                    }
+
+                }
+
+
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    private void checkExpectedDeliveries(DecoratedNodeParsingEvent event, File[] newspapers) {
+        try {
+            File filepath = new File(Thread.currentThread()
+                                               .getContextClassLoader()
+                                               .getResource("ExpectedDelivery.yaml")
+                                               .toURI());
+            YAML expectedNewspapers = YAML.resolveLayeredConfigs(String.valueOf(filepath));
+            List<String> xmlNewspapers = expectedNewspapers.getList("newspapers");
+            List<String> newspapersList = new ArrayList<>(Arrays.stream(newspapers).map(File::getName).toList());
+            checkTrue(event, FailureType.DELIVERY_PATTERN_ERROR, "Batch do not contain expected newspapers",
+                      newspapersList.containsAll(xmlNewspapers));
+            newspapersList.removeAll(xmlNewspapers);
+            checkTrue(event,FailureType.DELIVERY_PATTERN_ERROR,"Batch contained more newspapers than expected"+newspapersList.toArray(),newspapersList.isEmpty());
+
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 }

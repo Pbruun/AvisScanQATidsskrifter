@@ -169,7 +169,7 @@
             <xs:enumeration value="CHECKSUM_MISSING_ERROR" />
             <xs:enumeration value="CHECKSUM_MISMATCH_ERROR" />
 
-
+            <xs:enumeration value="DELIVERY_PATTERN_ERROR" />
             <!--Related to file contents-->
 
             <xs:enumeration value="INCONSISTENCY_ERROR" />

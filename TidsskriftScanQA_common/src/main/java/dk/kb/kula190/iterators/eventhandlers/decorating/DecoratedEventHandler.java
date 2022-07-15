@@ -8,96 +8,110 @@ import org.verapdf.core.ValidationException;
 import java.io.IOException;
 import java.time.LocalDate;
 
-public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
-    
+public abstract class DecoratedEventHandler extends AbstractDecoratedEventHandler {
+
     public DecoratedEventHandler(ResultCollector resultCollector) {
         super(resultCollector);
     }
-    
+
     @Override
     public void batchBegins(DecoratedNodeParsingEvent event,
                             String newspaper,
                             String roundTrip,
                             LocalDate startDate,
-                            LocalDate endDate) throws IOException {}
-    
+                            LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void batchEnds(DecoratedNodeParsingEvent event,
                           String newspaper,
                           String roundTrip,
                           LocalDate startDate,
-                          LocalDate endDate) throws IOException {}
-    
+                          LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void modsBegins(DecoratedNodeParsingEvent event,
                            String newspaper,
                            String roundTrip,
                            LocalDate startDate,
-                           LocalDate endDate) throws IOException {}
+                           LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void modsFile(DecoratedAttributeParsingEvent event,
                          String newspaper,
                          String roundTrip,
                          LocalDate startDate,
-                         LocalDate endDate) throws IOException {}
+                         LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void modsEnds(DecoratedNodeParsingEvent event,
                          String newspaper,
                          String roundTrip,
                          LocalDate startDate,
-                         LocalDate endDate) throws IOException {}
-    
+                         LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void metsBegins(DecoratedNodeParsingEvent event,
                            String newspaper,
                            String roundTrip,
                            LocalDate startDate,
-                           LocalDate endDate) throws IOException {}
-    
+                           LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void metsFile(DecoratedAttributeParsingEvent event,
                          String newspaper,
                          String roundTrip,
                          LocalDate startDate,
-                         LocalDate endDate) throws IOException {}
+                         LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void metsEnds(DecoratedNodeParsingEvent event,
                          String newspaper,
                          String roundTrip,
                          LocalDate startDate,
-                         LocalDate endDate) throws IOException {}
-    
+                         LocalDate endDate) throws IOException {
+    }
+
     @Override
     public void editionBegins(DecoratedNodeParsingEvent event,
                               String newspaper,
                               LocalDate editionDate,
-                              String edition) throws IOException {}
+                              String edition) throws IOException {
+    }
+
     @Override
     public void editionEnds(DecoratedNodeParsingEvent event,
                             String newspaper,
                             LocalDate editionDate,
-                            String edition) throws IOException {}
-    
-    
-    
+                            String edition) throws IOException {
+    }
+
+
     @Override
     public void sectionBegins(DecoratedNodeParsingEvent event,
                               String newspaper,
                               LocalDate editionDate,
                               String edition,
                               String section) throws IOException {
-        
+
     }
-    
+
     @Override
     public void sectionEnds(DecoratedNodeParsingEvent event,
                             String newspaper,
                             LocalDate editionDate,
                             String edition,
                             String section) throws IOException {
-        
+
+        newspaperFolder(event,newspaper);
     }
-    
+
     @Override
     public void pageBegins(DecoratedNodeParsingEvent event,
                            String newspaper,
@@ -105,9 +119,9 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                            String udgave,
                            String section,
                            Integer pageNumber) throws IOException {
-        
+
     }
-    
+
     @Override
     public void pageEnds(DecoratedNodeParsingEvent event,
                          String newspaper,
@@ -115,10 +129,10 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                          String edition,
                          String section,
                          Integer pageNumber) throws IOException {
-        
+
     }
-    
-   
+
+
     @Override
     public void mixFile(DecoratedAttributeParsingEvent event,
                         String newspaper,
@@ -126,9 +140,9 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                         String edition,
                         String section,
                         Integer pageNumber) throws IOException {
-        
+
     }
-    
+
     @Override
     public void tiffFile(DecoratedAttributeParsingEvent event,
                          String newspaper,
@@ -136,9 +150,8 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                          String edition,
                          String section,
                          Integer pageNumber) throws IOException {
-        
     }
-    
+
     @Override
     public void altoFile(DecoratedAttributeParsingEvent event,
                          String newspaper,
@@ -146,9 +159,9 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                          String edition,
                          String section,
                          Integer pageNumber) throws IOException {
-        
+
     }
-    
+
     @Override
     public void pdfFile(DecoratedAttributeParsingEvent event,
                         String newspaper,
@@ -157,9 +170,9 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                         String section,
                         Integer pageNumber)
             throws IOException, ValidationException, EncryptedPdfException, ModelParsingException {
-        
+
     }
-    
+
     @Override
     public void injectedFile(DecoratedAttributeParsingEvent decoratedEvent,
                              String injectedType,
@@ -168,7 +181,7 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                              String edition,
                              String section,
                              Integer pageNumber) throws IOException {
-        
+
     }
 
     @Override
@@ -178,6 +191,12 @@ public class DecoratedEventHandler extends AbstractDecoratedEventHandler {
                         String udgave,
                         String sectionName,
                         Integer pageNumber, Boolean article) throws IOException {
+
+    }
+
+    @Override
+    public void newspaperFolder(DecoratedNodeParsingEvent event,
+                                String avis) throws IOException {
 
     }
 }

@@ -104,7 +104,6 @@ public class AvisScanQATool {
 
     private void registerResultInDB(Batch batch, ResultCollector resultCollector, YAML config) throws IOException {
         final List<Failure> failures = resultCollector.getFailures();
-
         DecoratedRunnableComponent databaseComponent = new DecoratedRunnableComponent(
                 rc -> List.of(new DatabaseRegister(rc,
                                                    new Driver(),

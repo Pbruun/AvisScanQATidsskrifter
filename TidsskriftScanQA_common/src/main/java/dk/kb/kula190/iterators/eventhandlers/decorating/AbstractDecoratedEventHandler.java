@@ -17,6 +17,7 @@ import org.verapdf.core.ValidationException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
 
     protected final InheritableThreadLocal<String> batchName = new InheritableThreadLocal<>();
     protected final InheritableThreadLocal<String> batchLocation = new InheritableThreadLocal<>();
-
+    private final HashSet<String> newspapers = new HashSet();
     public AbstractDecoratedEventHandler(ResultCollector resultCollector) {
         super(resultCollector);
     }
@@ -150,11 +151,10 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
     @Override
     public final void handleAttribute(AttributeParsingEvent event) {
         try {
+
             final String name = event.getName();
             String extension = EventHandlerUtils.getExtension(name);
-
             DecoratedAttributeParsingEvent decoratedEvent = new DecoratedAttributeParsingEvent(event);
-
             switch (extension) {
                 case "mets" -> metsFile(decoratedEvent,
                                         decoratedEvent.getAvis(),
@@ -178,12 +178,12 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                       decoratedEvent.getUdgave(),
                                       decoratedEvent.getSectionName(),
                                       decoratedEvent.getPageNumber());
-                case "tif","tiff" -> tiffFile(decoratedEvent,
-                                       decoratedEvent.getAvis(),
-                                       decoratedEvent.getEditionDate(),
-                                       decoratedEvent.getUdgave(),
-                                       decoratedEvent.getSectionName(),
-                                       decoratedEvent.getPageNumber());
+                case "tif", "tiff" -> tiffFile(decoratedEvent,
+                                               decoratedEvent.getAvis(),
+                                               decoratedEvent.getEditionDate(),
+                                               decoratedEvent.getUdgave(),
+                                               decoratedEvent.getSectionName(),
+                                               decoratedEvent.getPageNumber());
                 case "pdf" -> pdfFile(decoratedEvent,
                                       decoratedEvent.getAvis(),
                                       decoratedEvent.getEditionDate(),
@@ -200,7 +200,7 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                  decoratedEvent.getSectionName(),
                                  decoratedEvent.getPageNumber());
                 }
-                case "xml" ->{
+                case "xml" -> {
                     xmlFile(decoratedEvent,
                             decoratedEvent.getAvis(),
                             decoratedEvent.getEditionDate(),
@@ -220,7 +220,6 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
         }
     }
 
-    
     boolean isEdition(ParsingEvent event) {
         return getLevel(event) == 3
                && !Set.of("METS", "MODS").contains(EventHandlerUtils.lastName(event.getName()))
@@ -401,4 +400,7 @@ public abstract class AbstractDecoratedEventHandler extends DefaultTreeEventHand
                                  String sectionName,
                                  Integer pageNumber, Boolean article) throws IOException;
 
+
+    public abstract void newspaperFolder(DecoratedNodeParsingEvent event,
+                                         String avis) throws IOException;
 }
