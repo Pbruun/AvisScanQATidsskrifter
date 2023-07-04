@@ -12,7 +12,7 @@
 
 jdbc:
   enabled: true
-  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/postgres"
   jdbc-user: "pabr"
   jdbc-password: ""
 

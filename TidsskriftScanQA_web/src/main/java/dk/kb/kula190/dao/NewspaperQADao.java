@@ -172,6 +172,14 @@ public class NewspaperQADao {
         }
     }
 
+    public List<SlimBatch> getBatchesFromMonthAndYear(String month,String year) throws DAOFailureException {
+        try (Connection conn = connectionPool.getConnection()){
+            return DaoBatchHelper.getAllBatchesFromMonthAndYear(conn,month,year);
+        }catch (SQLException e){
+            log.error("Failed to lookup batch ids", e);
+            throw new DAOFailureException("Err looking up batch ids", e);
+        }
+    }
 
     public List<SlimBatch> getBatchIDs() throws DAOFailureException {
         log.debug("Looking up batch ids");
@@ -241,21 +249,24 @@ public class NewspaperQADao {
 
             try (PreparedStatement ps = conn.prepareStatement(
                     """
-                    select edition_date,
-                           batchid,
+                    select newspaperarchive.edition_date,
+                           newspaperarchive.batchid,
                            count(DISTINCT(edition_title)) as numEditions,
                            count(*) as numPages,
-                           string_agg(newspaperarchive.problems, '\\n') as allProblems
-                    from newspaperarchive
+                           string_agg(problems.problem, '\\n') as allProblems
+                    from newspaperarchive, problems
                     where newspaperarchive.avisid = ? and
-                      EXTRACT(YEAR FROM edition_date) = ?
-                    group by edition_date, batchid
+                      EXTRACT(YEAR FROM newspaperarchive.edition_date) = ?
+                      AND problems.batchid = ? AND problems.newspaper = ?
+                    group by newspaperarchive.edition_date, newspaperarchive.batchid
                     """)) {
                 //ascending sort ensures that the highest roundtrips are last
                 //last entry for a given date wins. So this way, the calender will show the latest roundtrips
 
                 ps.setString(1, avisID);
                 ps.setInt(2, Integer.parseInt(year));
+                ps.setString(3,"dl_20221201_rt1");
+                ps.setString(4,avisID);
                 //ps.setString(3, year);
                 try (ResultSet res = ps.executeQuery()) {
 
@@ -416,7 +427,28 @@ public class NewspaperQADao {
             throw new DAOFailureException("Err looking up dates for newspaper id", e);
         }
     }
+    private List<String> getProblems(String batchID,String newspaperID,Connection conn){
+        List<String> problems = new ArrayList<>();
+        try(PreparedStatement ps = conn.prepareStatement(
+                """
+                    SELECT * FROM problems WHERE
+                    batchid = ? AND 
+                    newspaper = ?
+                    """
+        )) {
+           ps.setString(1,batchID);
+           ps.setString(2,newspaperID);
+           try (ResultSet res = ps.executeQuery()){
+                while (res.next()){
+                    problems.add(res.getString("problem"));
+                }
+           }
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return problems;
+    }
     private List<NewspaperEdition> getEditions(String batchID,
                                                String newspaperID,
                                                LocalDate date,
@@ -425,9 +457,9 @@ public class NewspaperQADao {
 
         try (PreparedStatement ps = conn.prepareStatement(
                 "SELECT orig_relpath, format_type, p.edition_date, single_page, p.page_number, p.avisid, avistitle, " +
-                "shadow_path, p.section_title, p.edition_title, delivery_date, handle, side_label, fraktur, problems," +
+                "shadow_path, p.section_title, p.edition_title, delivery_date, handle, side_label, fraktur," +
                 " p.batchid"
-                + " FROM newspaperarchive as p "
+                + " FROM newspaperarchive as p"
                 + " WHERE p.batchid = ? AND p.avisid = ? AND p.edition_date = ?"
                 + " ORDER BY p.section_title, p.page_number ASC")) {
 
@@ -468,7 +500,7 @@ public class NewspaperQADao {
                                                             .handle(res.getLong("handle"))
                                                             .singlePage(res.getBoolean("single_page"))
                                                             .fraktur(res.getBoolean("fraktur"))
-                                                            .problems(res.getString("problems"));
+                                                            .problems(getProblems(batchID,newspaperID,conn).toString());
 
                     pages.add(page);
                 }

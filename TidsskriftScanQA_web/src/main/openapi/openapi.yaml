@@ -131,7 +131,29 @@ paths:
         '204':
           description: Batch updated
 
-
+  /batches/{month}/{year}:
+    get:
+      operationId: getBatchForYearAndMonth
+      parameters:
+        - name: month
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SlimBatch"
 
   /batch/{batchID}/{year}:
     get:

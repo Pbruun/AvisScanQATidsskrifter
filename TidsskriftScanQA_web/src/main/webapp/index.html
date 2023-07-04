@@ -29,7 +29,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.19.1/extensions/filter-control/bootstrap-table-filter-control.min.css"
           integrity="sha512-Bp809hjtqoA7trnUdQG7vMngkhISMbjQ6kGiCqeCKh4WgLm7GZbQLjCNWWZmeglwp4wc3qpBzBvKNkmpuxRfxw=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
-
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/js-year-calendar@latest/dist/js-year-calendar.min.css" />
     <link rel="stylesheet" href="dashboard.css" >
 
 </head>
@@ -48,6 +48,13 @@
                         <a class="nav-link active" href="#/dashboard/">
                             <span data-feather="home"></span>
                             Dashboard <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#/technicalqa/">
+                            <span data-feather="technical"></span>
+                            Technical QA
+                            <span class="sr-only"></span>
                         </a>
                     </li>
                 </ul>
@@ -76,7 +83,7 @@
             <div id="state-div"></div>
             <div id="notice-div"></div>
             <div id="primary-show"></div>
-            <table id="batchOverview-table"></table>
+<!--            <table id="batchOverview-table"></table>-->
         </main>
     </div>
 </div>
@@ -125,12 +132,14 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script src="libs/jquery.routes.js"></script>
-
+<script src="https://unpkg.com/js-year-calendar@latest/dist/js-year-calendar.min.js"></script>
 <script src="libs/tiff.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.8/pdfobject.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-<script src="displayBatches.js"></script>
 <script src="displayEditions.js"></script>
+<script src="displayBatches.js"></script>
 <script src="displayNewspapers.js"></script>
+<script src="technicalDisplay.js"></script>
 
 <script>
 
@@ -146,6 +155,10 @@
         clearAll();
         $("#primary-show").html("Vælg avis i menuen til venstre");
         renderBatchTable();
+    });
+    $.routes.add('/technicalqa/',function (){
+        clearAll();
+        renderTechnicalDisplay();
     });
 
     $.routes.add('/newspaper/{id:string}/{year:int}', function () {

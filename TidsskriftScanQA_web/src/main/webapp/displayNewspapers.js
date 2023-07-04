@@ -244,6 +244,25 @@ function loadYearsForNewspaper(avisID, year) {
  * @param {String} url url to get NewspaperDates from
  */
 function renderNewspaperForYear(years, currentyear, url) {
+
+    let $primary = $("#primary-show").empty();
+    for (const year of years) {
+        const link = $("<a/>").attr({
+            href: editYearIndexInHash(location.hash, year),
+            class: `btn btn-sm btn-outline-secondary ${(year == currentyear ? "active" : "")}`,
+        }).text(year);
+        $("#year-nav").append(link);
+    }
+
+    //See dk.kb.kula190.api.impl.DefaultApiServiceImpl.getDatesForNewspaperYear
+    $.getJSON(url)
+        .done(function (dates) {
+            let datesInYear = splitDatesIntoMonths(dates);
+            buildCalendar(currentyear, datesInYear)
+
+        });
+}
+function renderNewspaperForYear2(years, currentyear, url) {
     const yearNav = $("<div/>", {
         class: 'btn-group mr-2 d-flex justify-content-evenly flex-wrap',
         id: 'year-nav'
@@ -273,144 +292,83 @@ function renderNewspaperForYear(years, currentyear, url) {
     $.getJSON(url)
         .done(function (dates) {
             let datesInYear = splitDatesIntoMonths(dates);
-            $("#year-show").load("calendarDisplay.html", async function () {
-                for (let i = 0; i < datesInYear.length; i++) {
-                    const calElem = "#month" + i;
-                    let datesInYearElement = datesInYear[i];
-                    let html = "<h3>" + datesInYearElement.name + "</h3>";
-                    html += await buildCalendar(currentyear, (i + 1), datesInYearElement.days);
-                    $(calElem).html(html);
+            // $("#year-show").load("calendarDisplay.html", async function () {
+            for (let i = 0; i < datesInYear.length; i++) {
+                // const calElem = "#month" + i;
+                // let datesInYearElement = datesInYear[i];
+                // let html = "<h3>" + datesInYearElement.name + "</h3>";
+                buildCalendar(currentyear, datesInYearElement.days);
+                    // $(calElem).html(html);
                 }
-            });
+            // });
         });
 }
 /**
- * @param { {state: string, problems: string, count: number} } dayInMonth
+ *
  * @param { jQuery|HTMLElement } element
  * @param {number} noteCount
  * Depending on batch state, or some conditions
  * The styling on the element are changed
  * Usage on newspaper, batch calendar and edition page buttons.
  */
-function determineColor(dayInMonth, element, noteCount) {
+function determineColor(dayInMonth, noteCount) {
+    //TODO Color code if no content on day
+    dayInMonth.problems = dayInMonth.problems == null ? "PROBLEMS" : dayInMonth.problems
     if (dayInMonth.state === "") {
-        element.css(configJson.global.calendarStyling.notWithinBatch);
+        return configJson.global.calendarStyling.notWithinBatch;
     } else if (dayInMonth.problems.length > 0) {
-        element.css(configJson.global.calendarStyling.error);
-    } else if (dayInMonth.count === 0) {
-        element.css(configJson.global.calendarStyling.noPageWithin);
-    } else if (dayInMonth.state) {
-        if (dayInMonth.state === "APPROVED") {
-            element.css(configJson.global.calendarStyling.default);
-        } else {
-            element.css(configJson.batch.stateButtonOptions[dayInMonth.state].calendarStyling);
-        }
-
-    } else {
-        element.css(configJson.global.calendarStyling.default);
+        return configJson.global.calendarStyling.error;
+    }
+    else {
+        return configJson.global.calendarStyling.default;
     }
     if (dayInMonth.state === "APPROVED") {
-        element.css(configJson.batch.stateButtonOptions.APPROVED.calendarStyling);
-    }
-    if (noteCount > 0) {
-        element.css(configJson.global.calendarStyling.containsNotes);
+        return configJson.batch.stateButtonOptions.APPROVED.calendarStyling;
     }
 }
-/**
- * @param {number} year
- * @param {number} month
- * @param {NewspaperDate[]} availableDates
- * @returns {string}
- */
-async function buildCalendar(year, month, availableDates) {
+function buildCalendar(year, availableDates, numberOfMonths=12){
+    let $primary = $("#primary-show");
+    let $calendar = $("<div/>",{class:"calendar"})
+    $primary.append($calendar);
+    let dataSource = [];
+    for (let ad in availableDates) {
+        for(let d in availableDates[ad].days){
+            dataSource.push(
+                {
+                    batchid: availableDates[ad].days[d].batchid,
+                    avisid: availableDates[ad].days[d].avisid,
+                    date: availableDates[ad].days[d].day,
+                    startDate: availableDates[ad].days[d].day._d,
+                    endDate: availableDates[ad].days[d].day._d,
+                    color: determineColor(availableDates[ad].days[d],availableDates[ad].days[d].notesCount).backgroundColor
+                })
 
-
-    let firstDayOfThisMonth = moment(year + "-" + month + "-01", "YYYY-MM-DD");
-    let daysInMonth = [];
-    let firstWeekdayOfMonth = firstDayOfThisMonth.weekday();
-    let d = moment(firstDayOfThisMonth);
-    for (let i = 0; i < firstDayOfThisMonth.daysInMonth(); i++) {
-        //Fill in all dates in the calender
-        daysInMonth.push({
-            day: moment(d),
-            available: false,
-            count: 0,
-            editionCount: 0,
-            state: "",
-            problems: "",
-            notesCount: 0,
-            avisid: "",
-            batchid: ""
-        });
-        d.add(1, 'days');
-    }
-    for (let availableDate of availableDates) {
-        //overwrite days where we have content
-        let element = daysInMonth[availableDate.day.date() - 1];
-        element.available = true;
-        element.count = availableDate.count;
-        element.editionCount = availableDate.editionCount;
-        element.state = availableDate.state;
-        element.problems = availableDate.problems;
-        element.notesCount = availableDate.notesCount;
-        element.avisid = availableDate.avisid;
-        element.batchid = availableDate.batchid;
-    }
-
-    let calHtml = "";
-    calHtml += "<div class='row weekDayLetters'>";
-    let weekDayLetters = ['M', 'T', 'O', 'T', 'F', 'L', 'S'];
-    for (let i = 0; i < weekDayLetters.length; i++) {
-        calHtml += "<div class='col-sm-1'>" + weekDayLetters[i] + "</div>";
-    }
-    calHtml += "</div>";
-    if (firstWeekdayOfMonth > 0) {
-
-        calHtml += "<div class='row'>";
-        for (let i = 0; i < firstWeekdayOfMonth; i++) {
-            calHtml += "<div class='col-sm-1'>&nbsp;</div>";
         }
     }
-    for (let d = 0; d < daysInMonth.length; d++) {
-        let colIdx = (firstWeekdayOfMonth + d) % 7;
-        if (colIdx === 0) {
-            if (d !== 0) {
-                calHtml += "</div>";
-            }
-            calHtml += "<div class='row'>";
-        }
-        let dayInMonth = daysInMonth[d];
-        let date = ("0" + dayInMonth.day.date());
-        let month = ("0" + dayInMonth.day.month());
-        //Ensure same width of date numbers
-        date = date.substring(date.length - 2);
-        month = month.substring(date.length - 2);
-        if (dayInMonth.available && dayInMonth.editionCount === 0) {
-            let noEditionDate = `${dayInMonth.day.format('YYYY-MM-DD')}`;
-            dayInMonth.notesCount = await getNoteCountForNoEdition(dayInMonth.batchid, dayInMonth.avisid, noEditionDate);
-        }
-        calHtml += "<div class='col-sm-1' >";
+    const calendar = new Calendar(document.querySelector(".calendar"),{
+        //TODO Handle multiple years
+        startDate: new Date(year.toString()),
+        clickDay: openCalendarDay,
+        minDate: new Date((year - 1).toString() + "-12-31"),
+        maxDate: new Date(year.toString() + "-12-31"),
+        style: "background",
+        numberMonthsDisplayed: numberOfMonths
+    })
 
-        let button;
-        if (dayInMonth.available) {
-            button = $("<a/>", {
-                href: "#/newspapers/" + dayInMonth.batchid + "/" + dayInMonth.avisid + "/" + dayInMonth.day.format('YYYY-MM-DD') + "/0/0/0/",
-                title: dayInMonth.count + " page(s) \n" + dayInMonth.editionCount + " edition(s)\n" + dayInMonth.notesCount + " note(s)"
-            });
-        } else {
-            button = $("<button/>", {
-                type: 'button'
-            });
-        }
-        button.attr("style", 'padding-left: 0; padding-right: 0')
-            .text(date)
-            .addClass("btn btn-sm");
-        determineColor(dayInMonth, button, dayInMonth.notesCount);
-        calHtml += button.prop('outerHTML');
-        calHtml += "</div>";
+    calendar.setDataSource(dataSource)
+    console.log(calendar.getDataSource())
+
+}
+function openCalendarDay(e){
+    //TODO Look into when we got days without content
+    if(e.events[0]){
+        let batchid = e.events[0].batchid
+        let avisid = e.events[0].avisid
+        let date = e.events[0].date.format('YYYY-MM-DD')
+        location.href = "#/newspapers/" + batchid + "/" + avisid + "/" + date + "/0/0/0/";
     }
-    calHtml += "</div>";
-    return calHtml;
+
+
 }
 /**
  * @returns {Promise}

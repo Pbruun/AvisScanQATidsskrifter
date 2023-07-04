@@ -1,5 +1,9 @@
 let editionJsonData;
-
+/** @type {NewspaperDay} NEWSPAPERDATE*/
+let NEWSPAPERDATE;
+let EDITIONINDEX;
+let SECTIONINDEX;
+let PAGEINDEX;
 /**
  * Creates the top row for the edition display
  * @param { String } batchID
@@ -10,65 +14,99 @@ let editionJsonData;
  * @param {number} pageIndex
  */
 function loadEditionsForNewspaperOnDate(batchID, avisID, date, editionIndex, sectionIndex, pageIndex) {
-    let day = moment(date).format('YYYY-MM-DD');
-    let nextDay = moment(date).add(1, 'd').format("YYYY-MM-DD")
-    let pastDay = moment(date).subtract(1, 'd').format("YYYY-MM-DD")
-    let url = `api/batch/${batchID}/${avisID}/${day}`
-    $("#notice-div").empty();
-    $("#state-div").empty();
-    $("#batchOverview-table").empty();
-    const $headline = $("#headline-div").empty();
-    $("#primary-show").empty();
     $.getJSON("api/config.json").done(function (data) {
         editionJsonData = data.edition
     })
+    loadNewspaperDay(batchID,avisID,date,renderBatchButtons,editionIndex,sectionIndex,pageIndex);
+    // $.getJSON(url)
+    //     .done(
+    //         /**
+    //          * @param {NewspaperDay} newspaperDay
+    //          * */
+    //         function (newspaperDay) {
+    //
+    //         })
+    //     .fail(function (jqxhr, textStatus, error) {
+    //         $headline.append($("<h1/>").text(`${jqxhr.responseText}`));
+    //     });
+}
+/**
+ * Creates Back to newspaper year and back to batch buttons. And creates headline for the newspaper.
+ * @param {NewspaperDay} newspaperDay
+ * @param {number} editionIndex
+ * @param {number} sectionIndex
+ * @param {number} pageIndex
+ */
+function renderBatchButtons(newspaperDay,editionIndex,sectionIndex,pageIndex){
+    let day = moment(newspaperDay.date).format('YYYY-MM-DD');
+    let nextDay = moment(newspaperDay.date).add(1, 'd').format("YYYY-MM-DD")
+    let pastDay = moment(newspaperDay.date).subtract(1, 'd').format("YYYY-MM-DD")
+    $("#notice-div").empty();
+    $("#state-div").empty();
+    $("#primary-show").empty();
 
+    const $headline = $("#headline-div").empty();
+    $headline.append($("<a/>", {
+        class: "btn btn-secondary",
+        text: "Back to newspaper year",
+        href: `#/newspaper/${newspaperDay.batch.avisid}/${day.split('-')[0]}/`
+    }))
+    $headline.append($("<a/>", {
+        class: "btn btn-secondary", text: "Back to batch", href: `#/batch/${newspaperDay.batch.batchid}/`
+    }))
+    let $buttonForward = $("<a/>", {
+        class: "btn btn-secondary bi bi-caret-right",
+        href: `#/newspapers/${newspaperDay.batch.batchid}/${newspaperDay.batch.avisid}/${nextDay}/0/0/0/`
+    }).css({"float": "right"})
+    if (day === newspaperDay.batch.endDate) {
+
+        $buttonForward.css({
+            "background-color": "#6c757d9e",
+            "border-color": "#6c757d9e",
+            "pointer-events": "none"
+        })
+    }
+    $headline.append($buttonForward)
+    let $buttonBack = $("<a/>", {
+        class: "btn btn-secondary bi bi-caret-left",
+        href: `#/newspapers/${newspaperDay.batch.batchid}/${newspaperDay.batch.avisid}/${pastDay}/0/0/0/`
+    }).css({"float": "right"})
+    if (day === newspaperDay.batch.startDate) {
+        $buttonBack.css({
+            "background-color": "#6c757d9e",
+            "border-color": "#6c757d9e",
+            "pointer-events": "none"
+        })
+    }
+    $headline.append($buttonBack)
+    $headline.append($("<h1>").text(`Editions for ${newspaperDay.batch.avisid} on ${day}`));
+    renderDayDisplay(newspaperDay, editionIndex, sectionIndex, pageIndex);
+}
+/**
+ *
+ * @param batchID
+ * @param avisID
+ * @param date
+ * @param {function} renderFunction
+ * @param editionIndex
+ * @param sectionIndex
+ * @param pageIndex
+ */
+function loadNewspaperDay(batchID,avisID,date, renderFunction, editionIndex, sectionIndex, pageIndex){
+    let day = moment(date).format('YYYY-MM-DD');
+    let url = `api/batch/${batchID}/${avisID}/${day}`
     $.getJSON(url)
         .done(
             /**
              * @param {NewspaperDay} newspaperDay
              * */
             function (newspaperDay) {
-
-                $headline.append($("<a/>", {
-                    class: "btn btn-secondary",
-                    text: "Back to newspaper year",
-                    href: `#/newspaper/${avisID}/${day.split('-')[0]}/`
-                }))
-                $headline.append($("<a/>", {
-                    class: "btn btn-secondary", text: "Back to batch", href: `#/batch/${batchID}/`
-                }))
-                let $buttonForward = $("<a/>", {
-                    class: "btn btn-secondary bi bi-caret-right",
-                    href: `#/newspapers/${batchID}/${avisID}/${nextDay}/0/0/0/`
-                }).css({"float": "right"})
-                if (day === newspaperDay.batch.endDate) {
-
-                    $buttonForward.css({
-                        "background-color": "#6c757d9e",
-                        "border-color": "#6c757d9e",
-                        "pointer-events": "none"
-                    })
-                }
-                $headline.append($buttonForward)
-                let $buttonBack = $("<a/>", {
-                    class: "btn btn-secondary bi bi-caret-left",
-                    href: `#/newspapers/${batchID}/${avisID}/${pastDay}/0/0/0/`
-                }).css({"float": "right"})
-                if (day === newspaperDay.batch.startDate) {
-                    $buttonBack.css({
-                        "background-color": "#6c757d9e",
-                        "border-color": "#6c757d9e",
-                        "pointer-events": "none"
-                    })
-                }
-                $headline.append($buttonBack)
-                $headline.append($("<h1>").text(`Editions for ${avisID} on ${day}`));
-                renderDayDisplay(newspaperDay, editionIndex, sectionIndex, pageIndex);
+                renderFunction(newspaperDay,editionIndex,sectionIndex,pageIndex)
             })
         .fail(function (jqxhr, textStatus, error) {
+            const $headline = $("#headline-div").empty();
             $headline.append($("<h1/>").text(`${jqxhr.responseText}`));
-        });
+        })
 }
 
 
@@ -79,7 +117,6 @@ function noteSubmitHandler(event, url) {
     let batchID = data.get('batch')
     let parts = ["api", "notes", batchID]
     let query = new URLSearchParams();
-
     query.append("avis", data.get('avis'));
     query.append("date", data.get('date'));
     query.append("edition", data.get('edition'));
@@ -87,14 +124,11 @@ function noteSubmitHandler(event, url) {
     query.append("page", data.get('page'));
 
     url = parts.join("/") + "?" + query.toString();
-
     const notes = data.get('standardNote') + " " + data.get('notes');
-
     $.ajax({
         type: "POST", url: url, data: notes, success: function () {
             alert("Note added");
-            location.reload();
-            //event.target.parentNode.append(createDisplayNoteForm(batchID,data))
+            loadNewspaperDay(NEWSPAPERDATE.batch.batchid,NEWSPAPERDATE.batch.avisid,NEWSPAPERDATE.date,renderNotes,EDITIONINDEX,SECTIONINDEX,PAGEINDEX);
         }, dataType: "json", contentType: "application/json"
     });
     return false;  // <- cancel event
@@ -127,37 +161,38 @@ function noteDeleteHandler(event) {
 
 function initComponents() {
     let $primary = $("#primary-show");
-    const $contentRow = $("<div/>", {class: "row", id: "contentRow"});
-    const $dayCol = $("<div/>", {id: "dayCol", class: "col"});
-    const $editionCol = $("<div/>", {id: "editionCol", class: "col"});
-    const $pageCol = $("<div/>", {id: "pageCol", class: "col"});
-    let $pageNavBtnToolbar = $("<div/>", {class: "btn-toolbar mb-2 mb-md-0"});
-    let $pageNav = $("<div/>", {class: "btn-group mr-2 d-flex justify-content-evenly flex-wrap", id: "page-nav"});
-    $contentRow.append($dayCol);
-    $contentRow.append($editionCol);
-    $pageNavBtnToolbar.append($pageNav);
-    $pageCol.append($pageNavBtnToolbar);
-    $contentRow.append($pageCol);
-    $primary.append($contentRow);
+    const $contentCol = $("<div/>", {class: "col-3", id: "contentCol"});
+    const $dayRow = $("<div/>", {id: "dayRow", class: "row"});
+    const $editionRow = $("<div/>", {id: "editionRow", class: "row"});
+    const $pageRow = $("<div/>", {id: "pageRow", class: "row"});
+    const $sectionRow = $("<div/>", {id: "sectionRow", class: "row"});
+    $contentCol.append($dayRow);
+    $contentCol.append($editionRow);
+    $contentCol.append($sectionRow);
+    $contentCol.append($pageRow);
+    $primary.append($contentCol);
 }
-
 /**
- * Creates the day column and the edition column with its content
+ * Creates notes display for date and newspaper
  * @param {NewspaperDay} newspaperDay
  * @param {number} editionIndex
  * @param {number} sectionIndex
  * @param {number} pageIndex
  */
-function renderDayDisplay(newspaperDay, editionIndex, sectionIndex, pageIndex) {
-    $("#primary-show").empty();
-    initComponents();
-    let editions = newspaperDay.editions;
-    // if (editionIndex < 0 || editionIndex >= editions.length) {
-    //     $("#primary-show").text(`Edition ${editionIndex + 1} not found. Day only has ${editions.length} editions`);
-    // }
-    const edition = editions[editionIndex];
+function renderNotes(newspaperDay, editionIndex, sectionIndex, pageIndex){
+    $("#dayRow").empty();
+    $("#editionRow").empty();
+    $("#pageRow").empty();
+    $("#sectionRow").empty();
+    renderDayNotes(newspaperDay);
+    renderEditionNotes(newspaperDay,editionIndex);
+    renderSectionsNotes(newspaperDay.editions[editionIndex],sectionIndex)
+    renderPageNotes(newspaperDay.editions[editionIndex].sections[sectionIndex].pages[pageIndex])
+}
+function renderDayNotes(newspaperDay){
+    NEWSPAPERDATE = newspaperDay;
     let $hiddenTextAreaValue = $("<input/>", {type: "hidden", name: "notes"});
-    const $dayCol = $("#dayCol");
+    const $dayRow = $("#dayRow");
     let $dayNotesTextArea = $("<span/>", {
         class: "userNotes", id: "dayNotes", type: "text"
     }).attr('contenteditable', true).on('input', (e) => {
@@ -190,106 +225,63 @@ function renderDayDisplay(newspaperDay, editionIndex, sectionIndex, pageIndex) {
     $dayNotesForm.append($("<input/>", {type: "hidden", name: "avis", value: newspaperDay.batch.avisid}));
     $dayNotesForm.append($("<input/>", {type: "hidden", name: "date", value: newspaperDay.date}));
     $dayNotesForm.submit(noteSubmitHandler);
-    $dayCol.append($dayNotesForm);
+    $dayRow.append($dayNotesForm);
 
     let $noteContainer = $("<div/>", {class: "noteContainer"});
     for (let i = 0; i < newspaperDay.notes.length; i++) {
         $noteContainer.append(createDisplayNoteForm(newspaperDay.batch.batchid, newspaperDay.notes[i]));
     }
-    $dayCol.append($noteContainer);
-    if (editionIndex < 0 || editionIndex >= editions.length) {
-        return;
-    }
-    const $editionCol = $("#editionCol");
-
-    const $editionNav = $("<div/>", {class: 'btn-toolbar mb-2 mb-md-0'})
-        .append($("<div/>", {
-            class: 'btn-group mr-2 d-flex justify-content-evenly flex-wrap', id: 'edition-nav'
-        }));
-    $editionCol.append($editionNav);
-
-    const editionShow = $("<div/>", {id: 'edition-show'}).append($("<h1>", {text: "show me a newspaper"}));
-    $editionCol.append(editionShow);
-
-    for (let i = 0; i < editions.length; i++) {
-        const edition = editions[i];
-        const link = $("<a/>").attr({
-            href: editEntityIndexInHash(location.hash, i),
-            class: `btn btn-sm btn-outline-secondary ${(i === editionIndex ? "active" : "")}`,
-        }).text(edition.edition);
-        $editionNav.append(link);
-    }
-    $("#edition-show").load("editionDisplay.html", function () {
-        let $hiddenTextAreaValue = $("<input/>", {type: "hidden", name: "notes"})
-        let $editionNotesTextArea = $("<span/>", {
-            class: "userNotes", id: "editionNotes", type: "text"
-        }).attr('contenteditable', true).on('input', (e) => {
-            $hiddenTextAreaValue.val(e.target.innerText);
-        })
-
-        let $editionNotesForm = $("<form>", {id: "editionNotesForm", action: "api/editionNotes", method: "post"});
-
-        const formRow1 = $("<div>", {class: "form-row"});
-        const formRow2 = $("<div>", {class: "form-row"});
-        $editionNotesForm.append(formRow1);
-        $editionNotesForm.append(formRow2);
-
-        let $dropDownEditionNotes = $("<select/>", {class: "form-select", name: "standardNote"});
-
-        $dropDownEditionNotes.append($("<option>", {value: "", html: "", selected: "true"}));
-        for (let option of editionJsonData.dropDownStandardMessage.udgDropDown.options) {
-            $dropDownEditionNotes.append($("<option>", {value: option, html: option}));
-        }
-        formRow1.append($dropDownEditionNotes);
-        formRow1.append($("<label/>", {for: "editionNotes"}).text("Edition notes"));
-        formRow2.append($editionNotesTextArea);
-        formRow2.append($hiddenTextAreaValue);
-        formRow2.append($("<input/>", {
-            id: "editionNotesFormSubmit", type: "submit", name: "submit", form: "editionNotesForm", value: "Gem"
-        }));
-        $editionNotesForm.append($("<input/>", {type: "hidden", name: "batch", value: edition.batchid}));
-        $editionNotesForm.append($("<input/>", {type: "hidden", name: "avis", value: edition.avisid}));
-        $editionNotesForm.append($("<input/>", {type: "hidden", name: "date", value: edition.date}));
-        $editionNotesForm.append($("<input/>", {type: "hidden", name: "edition", value: edition.edition}));
-        $editionNotesForm.submit(noteSubmitHandler);
-        $editionCol.append($editionNotesForm);
-        let $noteContainer = $("<div/>", {class: "noteContainer"});
-        for (let i = 0; i < edition.notes.length; i++) {
-            $noteContainer.append(createDisplayNoteForm(edition.batchid, edition.notes[i]));
-        }
-        $editionCol.append($noteContainer);
-        renderSections(edition, sectionIndex);
-        if (edition.sections[sectionIndex].pages.length === 1) {
-            renderSinglePage(edition.section[sectionIndex].pages[0]);
-        } else {
-            renderSection(edition.sections[sectionIndex], pageIndex);
-        }
-
-    });
+    $dayRow.append($noteContainer);
 }
+function renderEditionNotes(newspaperDay, editionIndex){
+    EDITIONINDEX = editionIndex;
+    let editions = newspaperDay.editions;
+    const edition = editions[editionIndex];
+    const $editionRow = $("#editionRow");
+    let $hiddenTextAreaValue = $("<input/>", {type: "hidden", name: "notes"})
+    let $editionNotesTextArea = $("<span/>", {
+        class: "userNotes", id: "editionNotes", type: "text"
+    }).attr('contenteditable', true).on('input', (e) => {
+        $hiddenTextAreaValue.val(e.target.innerText);
+    })
 
-/**
- * Creates the section column
- * @param {NewspaperEdition} edition
- * @param {Number} sectionIndex
- */
-function renderSections(edition, sectionIndex) {
-    let $pageDisplay = $("#contentRow");
-    let $sectionCol = $("<div/>", {id: "sectionCol", class: "col"});
-    $pageDisplay.append($sectionCol);
+    let $editionNotesForm = $("<form>", {id: "editionNotesForm", action: "api/editionNotes", method: "post"});
 
-    let sections = edition.sections.sort((a, b) => {
-        return a.section < b.section ? -1 : 1
-    });
+    const formRow1 = $("<div>", {class: "form-row"});
+    const formRow2 = $("<div>", {class: "form-row"});
+    $editionNotesForm.append(formRow1);
+    $editionNotesForm.append(formRow2);
 
-    for (let i = 0; i < sections.length; i++) {
-        $sectionCol.append($("<a>", {
-            class: `btn btn-sm btn-outline-secondary ${i === sectionIndex ? "active" : ""}`,
-            href: editSectionIndexInHash(location.hash, i),
-            text: `section ${i + 1}`,
-            title: sections[i].section
-        }));
+    let $dropDownEditionNotes = $("<select/>", {class: "form-select", name: "standardNote"});
+
+    $dropDownEditionNotes.append($("<option>", {value: "", html: "", selected: "true"}));
+    for (let option of editionJsonData.dropDownStandardMessage.udgDropDown.options) {
+        $dropDownEditionNotes.append($("<option>", {value: option, html: option}));
     }
+    formRow1.append($dropDownEditionNotes);
+    formRow1.append($("<label/>", {for: "editionNotes"}).text("Edition notes"));
+    formRow2.append($editionNotesTextArea);
+    formRow2.append($hiddenTextAreaValue);
+    formRow2.append($("<input/>", {
+        id: "editionNotesFormSubmit", type: "submit", name: "submit", form: "editionNotesForm", value: "Gem"
+    }));
+    $editionNotesForm.append($("<input/>", {type: "hidden", name: "batch", value: edition.batchid}));
+    $editionNotesForm.append($("<input/>", {type: "hidden", name: "avis", value: edition.avisid}));
+    $editionNotesForm.append($("<input/>", {type: "hidden", name: "date", value: edition.date}));
+    $editionNotesForm.append($("<input/>", {type: "hidden", name: "edition", value: edition.edition}));
+    $editionNotesForm.submit(noteSubmitHandler);
+    $editionRow.append($editionNotesForm);
+    let $noteContainer = $("<div/>", {class: "noteContainer"});
+    for (let i = 0; i < edition.notes.length; i++) {
+        $noteContainer.append(createDisplayNoteForm(edition.batchid, edition.notes[i]));
+    }
+    $editionRow.append($noteContainer);
+}
+function renderSectionsNotes(edition, sectionIndex) {
+    SECTIONINDEX = sectionIndex;
+    let $sectionRow = $("#sectionRow")
+    let sections = edition.sections;
+
     let $hiddenTextAreaValue = $("<input/>", {type: "hidden", name: "notes"})
     let $sectionNotesTextArea = $("<span/>", {
         class: "userNotes", id: "sectionNotes", type: "text"
@@ -339,24 +331,16 @@ function renderSections(edition, sectionIndex) {
         value: sections[sectionIndex].section
     }));
     $sectionNotesForm.submit(noteSubmitHandler);
-    $sectionCol.append($sectionNotesForm);
+    $sectionRow.append($sectionNotesForm);
     let $noteContainer = $("<div/>", {class: "noteContainer"});
     for (let i = 0; i < sections[sectionIndex].notes.length; i++) {
         $noteContainer.append(createDisplayNoteForm(edition.batchid, sections[sectionIndex].notes[i]));
     }
-    $sectionCol.append($noteContainer)
+    $sectionRow.append($noteContainer)
 }
-
-/**
- * Creates the page column
- * @param {NewspaperPage} page
- */
-function renderSinglePage(page) {
-    let $pageDisplay = $("#primary-show");
-
-    const date = moment(page.editionDate).format("YYYY-MM-DD");
-    const $pageCol = $("#pageCol");
-
+function renderPageNotes(page){
+    PAGEINDEX = page.pageNumber-1
+    const $pageRow = $("#pageRow");
     let $pageNotesForm = $("<form>", {id: "pageNotesForm", action: "", method: "post"});
 
     const formRow1 = $("<div>", {class: "form-row"});
@@ -394,27 +378,66 @@ function renderSinglePage(page) {
     $pageNotesForm.append($("<input/>", {type: "hidden", name: "page", value: page.pageNumber}));
 
     $pageNotesForm.submit(noteSubmitHandler);
-    $pageCol.append($pageNotesForm);
+    $pageRow.append($pageNotesForm);
     let $noteContainer = $("<div/>", {class: "noteContainer"});
     for (let i = 0; i < page.notes.length; i++) {
         $noteContainer.append(createDisplayNoteForm(page.batchid, page.notes[i]));
     }
-    $pageCol.append($noteContainer);
+    $pageRow.append($noteContainer);
 
-    let $contentRow = $("#contentRow");
-    $contentRow.append($pageCol);
+    let $contentCol = $("#contentCol");
+    $contentCol.append($pageRow);
+}
+/**
+ * Creates the day column and the edition column with its content
+ * @param {NewspaperDay} newspaperDay
+ * @param {number} editionIndex
+ * @param {number} sectionIndex
+ * @param {number} pageIndex
+ */
+function renderDayDisplay(newspaperDay, editionIndex, sectionIndex, pageIndex) {
+    $("#primary-show").empty();
+    initComponents();
+    let editions = newspaperDay.editions;
+    const edition = editions[editionIndex];
+    renderDayNotes(newspaperDay)
+    if (editionIndex < 0 || editionIndex >= editions.length) {
+        return;
+    }
+    renderEditionNotes(newspaperDay,editionIndex)
+    renderSectionsNotes(edition, sectionIndex);
+    edition.sections.sort((a, b) => {
+        return a.section < b.section ? -1 : 1
+    });
+    if (edition.sections[sectionIndex].pages.length === 1) {
+        renderSinglePage(edition.sections[sectionIndex].pages[0],newspaperDay);
+    } else {
+        renderSection(edition.sections[sectionIndex], pageIndex,edition.sections,newspaperDay);
+    }
+}
 
-    let $fileAndProblemsCol = $("<div/>", {class: "col-8"});
+/**
+ * Creates the page column
+ * @param {NewspaperPage} page
+ * @param {NewspaperDay} newspaperDay
+ */
+function renderSinglePage(page,sections,newspaperDay) {
+    let $pageDisplay = $("#primary-show");
+
+    const date = moment(page.editionDate).format("YYYY-MM-DD");
+    renderPageNotes(page)
+
+    let $fileAndProblemsCol = $("<div/>", {class: "col-12",id:"PDFview"});
 
     if (page.problems) {
-        $fileAndProblemsCol.append($("<p>").text("Problems: ").append($("<pre>").text(JSON.stringify(JSON.parse(page.problems), ['type', 'filereference', 'description'], 2))));
+        $fileAndProblemsCol.append($("<p>").text("Problems: ").append($("<pre>").text(JSON.stringify(page.problems))));
     }
-    loadImage(page.origRelpath, $fileAndProblemsCol, page.batchid);
+    loadFrontpages(sections,$fileAndProblemsCol,page.batchid);
 
-    let $infoDumpRow = $("<div/>", {class: "row"});
-    $infoDumpRow.append($fileAndProblemsCol);
+    let $infoDumpCol = $("<div/>", {class: "col-6"});
+    $infoDumpCol.append($fileAndProblemsCol);
 
-    let $entityInfoCol = $("<div/>", {class: "col-4"});
+    let $entityInfoCol = $("<div/>", {class: "col-4 infoCol"});
     let infoHtml = `Edition titel: ${page.editionTitle}<br>`;
     infoHtml += `Section titel: ${page.sectionTitle}<br>`;
     infoHtml += `Side nummer: ${page.pageNumber}<br>`;
@@ -422,12 +445,56 @@ function renderSinglePage(page) {
     infoHtml += `Afleverings dato: ${moment(page.deliveryDate).format("YYYY-MM-DD")}<br>`;
     infoHtml += `Udgivelses dato: ${date}<br>`;
     infoHtml += `Format type: ${page.formatType}<br>`;
-
+    let $pageTableCol = $("<div/>",{class:"col-3"});
+    let $tableRow = $("<div/>",{class:"row table-responsive"});
+    let $infoRow = $("<div/>",{class:"row"});
+    let $viewFrontPages = $("<div/>",{class:"row"});
+    $viewFrontPages.append($("<button/>",{type:"button",class:"btn btn-secondary frontPagesBtn",text:"View frontpages",click:function (){loadFrontpages(sections,$fileAndProblemsCol,page.batchid)}}))
+    $pageTableCol.append($viewFrontPages);
+    $pageTableCol.append($tableRow);
+    $pageTableCol.append($infoRow);
     $entityInfoCol.html(infoHtml);
-    $infoDumpRow.append($entityInfoCol);
-    $pageDisplay.append($infoDumpRow);
+    $pageDisplay.append($infoDumpCol);
+    $pageDisplay.append($pageTableCol);
+    createPageTable(sections,$tableRow,page.batchid,newspaperDay);
+    $infoRow.append($entityInfoCol);
+}
 
+function createPageTable(sections,pageCol,batchid,newspaperDay){
+    let $table = $("<table/>",{"class":"table table-striped table-hover","id":"pageNumberTable"});
+    let $tableHead = $("<thead/>");
+    let $tableBody = $("<tbody/>");
+    let $tableRow = $("<tr/>");
+    let $tableHeadPageNumber = $("<th/>",{"text":"Page Number"});
+    let $tableHeadSectionTitle = $("<th/>",{"text":"Section Title"});
 
+    $tableRow.append($tableHeadPageNumber)
+    $tableRow.append($tableHeadSectionTitle)
+    $tableHead.append($tableRow);
+    $table.append($tableHead);
+    $table.append($tableBody);
+    pageCol.append($table);
+
+    let totalPages = 0
+    for (let i = 0; i < sections.length; i++) {
+        for (let j = 0; j < sections[i].pages.length; j++) {
+            let $dataTableRow = $("<tr/>",{"value":[j,i]});
+            $dataTableRow.css("border-right","0.5em solid "+determineColor(sections[i].pages[j],sections[i].pages[j].notesCount).backgroundColor)
+            $dataTableRow.append($("<td/>",{"text":sections[i].pages[j].pageNumber + " af " + sections[i].pages.length}))
+            $dataTableRow.append($("<td/>",{"text":sections[i].pages[j].sectionTitle}))
+            $tableBody.append($dataTableRow)
+            $dataTableRow.click(function(){
+                $("#tableRowHighlight").attr("id","");
+                event.target.parentNode.id="tableRowHighlight";
+                loadNewspaperDay(newspaperDay.batch.batchid,newspaperDay.batch.avisid,newspaperDay.date,renderNotes,0,i,j);
+                //renderNotes(newspaperDay,0,i,j)
+                loadImage(sections[i].pages[j],$("#PDFview"),batchid)
+                })
+            totalPages++;
+        }
+    }
+    let $tableFooter = $("<tfoot/>").append($("<tr/>").append($("<td/>",{"colspan":"2","text":"Total pages: "+totalPages})));
+    $table.append($tableFooter);
 }
 
 /**
@@ -460,7 +527,7 @@ function createDisplayNoteForm(batchid, note) {
     formRow.append($pageNote);
     formRow.append($("<button/>", {class: "bi bi-x-circle-fill", type: "submit"}).css({
         "border": "none",
-        "background-color": "#fff"
+        "background-color": "transparent"
     }));
     $pageForm.submit(noteDeleteHandler);
     return $pageForm;
@@ -468,42 +535,42 @@ function createDisplayNoteForm(batchid, note) {
 
 /**
  *
- * @param {string} filename
+ * @param {Object} filename
  * @param {jQuery} element
  * @returns {*}
  */
 function loadImage(filename, element, batchid) {
-    let result = $("<div>");
+    element.empty();
+    let result = $("<div>",{id:"frontPage"});
     element.append(result);
-    filename = filename.replace("#", "%23");
+    filename = filename.origRelpath.replace("#", "%23");
     const url = "api/file/?file=" + filename + "&batchid=" + batchid;
-    return $.ajax({
-        type: "GET", url: url, xhrFields: {responseType: 'arraybuffer'}, beforeSend: function () {
-            result.text(`Loading Page`);
-        }, success: async function (data) {
-
-            let loading = pdfjsLib.getDocument(data);
-
-            const pdf = await loading.promise;
-            const page = await pdf.getPage(1);
-            const scale = 1;
-            const viewport = page.getViewport({scale});
-            const canvas = $("<canvas/>");
-
-            const context = canvas[0].getContext("2d");
-            canvas[0].height = viewport.height;
-            canvas[0].width = viewport.width;
-            const renderContext = {
-                canvasContext: context,
-                viewport
-            }
-
-            page.render(renderContext);
-            result.text("");
-            result.append(canvas);
-        }
-
-    });
+    return $.ajax({type:"GET",url:url,xhrFields: {responseType: 'arraybuffer'},success: async function(data){
+            let blob=new Blob([data], {type:"application/pdf"});
+            let pdfurl = window.URL.createObjectURL(blob);
+            result.append($("<iframe>",{src:pdfurl,type:"application/pdf",width:"100%", height:"150%"}))
+    }})
+}
+function loadFrontpages(sections, element, batchid) {
+    element.empty();
+    $("#sectionRow").empty();
+    $("#pageRow").empty();
+    $("#tableRowHighlight").attr("id","");
+    let $zoomedFrontpage = $("<div/>",{"id":"zoomedFrontpage"})
+    element.append($zoomedFrontpage)
+    for (let i = 0; i < sections.length; i++) {
+        let sectionFrontpage = sections[i].pages[0];
+        let result = $("<div>",{class:"pdfFrontPages"});
+        element.append(result);
+        sectionFrontpage = sectionFrontpage.origRelpath.replace("#", "%23");
+        const url = "api/file/?file=" + sectionFrontpage + "&batchid=" + batchid;
+        $.ajax({type:"GET",url:url,xhrFields: {responseType: 'arraybuffer'},success: async function(data){
+                let blob=new Blob([data], {type:"application/pdf"});
+                let pdfurl = window.URL.createObjectURL(blob);
+                let $pdf =$("<iframe>",{src:pdfurl,type:"application/pdf",width:"100%", height:"100%","class":"pdfFrontpage"});
+                result.append($pdf)
+            }})
+    }
 
 }
 
@@ -512,102 +579,15 @@ function loadImage(filename, element, batchid) {
  * @param { NewspaperSection } entity
  * @param {number} pageIndex
  */
-function renderSection(entity, pageIndex) {
-    let $pageNav = $("#page-nav");
+function renderSection(entity, pageIndex,sections,newspaperDay) {
     let pages = entity.pages;
-    createPageButtons(pages, $pageNav, pageIndex);
 
     if (pageIndex >= 0 && pageIndex < pages.length) {
-        renderSinglePage(pages[pageIndex]);
+        renderSinglePage(pages[pageIndex],sections,newspaperDay);
     } else {
         let $pageDisplay = $("#primary-show");
         $pageDisplay.text(`Page ${pageIndex + 1} not found. Edition only has ${pages.length} pages`);
     }
-}
-
-/**
- * Made to handle if an edition contains too many pages.
- * Creates the buttons to switch between the pages on an edition.
- * @param {NewspaperPage[]} pages
- * @param {jQuery|HTMLElement} parent
- * @param {number} page
- */
-function createPageButtons(pages, parent, page) {
-    let active;
-    let cutLow = page - 1;
-    let cutHigh = page + 1;
-    parent.append($("<a/>", {
-        class: "btn btn-sm btn-outline-secondary bi bi-arrow-left nextAndPreviousPage",
-        href: page === 0 ? editPageIndexInHash(location.hash, page) : editPageIndexInHash(location.hash, page - 1)
-    }));
-
-    if (pages.length - 1 < 8) {
-        for (let p = 0; p < pages.length; p++) {
-            active = page === p ? "active" : "no";
-            const link = $("<a/>").attr({
-                href: editPageIndexInHash(location.hash, p),
-
-                class: `btn btn-sm btn-outline-secondary ${active}`
-            }).text(p + 1);
-            determineColor(pages[p], link, pages[p].notes.length);
-            parent.append(link);
-        }
-    } else {
-        let link = $("<a/>", {
-            class: `btn btn-sm btn-outline-secondary ${page === 0 ? "active" : ""}`,
-            href: editPageIndexInHash(location.hash, 0)
-        }).text(1);
-
-        determineColor(pages[0], link, pages[0].notes.length);
-
-        parent.append(link);
-        if (page > 2) {
-            parent.append($("<a/>", {
-                class: "btn btn-sm out-of-range",
-                href: editPageIndexInHash(location.hash, page - 2)
-            }).text("..."));
-        }
-
-        if (page === 0) {
-            cutHigh = page + 2;
-        }
-        if (page === pages.length - 1) {
-            cutLow = page - 2;
-        }
-
-        for (let p = cutLow < 0 ? 0 : cutLow; p <= cutHigh; p++) {
-            if (p !== 0 && p < pages.length - 1) {
-                active = page === p ? "active" : "no";
-                const link = $("<a/>").attr({
-                    href: editPageIndexInHash(location.hash, p),
-
-                    class: `btn btn-sm btn-outline-secondary ${active}`
-                }).text(p + 1);
-                determineColor(pages[p], link, pages[p].notes.length);
-
-                parent.append(link);
-            }
-        }
-        if (page < pages.length - 2) {
-            if (page < pages.length - 3) {
-                parent.append($("<a/>", {
-                    class: "btn btn-sm out-of-range",
-                    href: editPageIndexInHash(location.hash, page + 2)
-                }).text("..."));
-            }
-
-        }
-        link = $("<a/>", {
-            class: `btn btn-sm btn-outline-secondary ${page === pages.length - 1 ? "active" : ""}`,
-            href: editPageIndexInHash(location.hash, pages.length - 1)
-        }).text(pages.length);
-        determineColor(pages[pages.length - 1], link, pages[pages.length - 1].notes.length);
-        parent.append(link);
-    }
-    parent.append($("<a/>", {
-        class: "btn btn-sm btn-outline-secondary bi bi-arrow-right nextAndPreviousPage",
-        href: page === pages.length - 1 ? editPageIndexInHash(location.hash, page) : editPageIndexInHash(location.hash, page + 1)
-    }));
 }
 
 /**

@@ -223,8 +223,10 @@ public class DefaultApiServiceImpl implements DefaultApi {
     @Override
     public StreamingOutput getTiffFile(String relPath,String batchID) {
         return output -> {
+
             Path batchesFolder = new File(getBatchesFolder()).toPath().toAbsolutePath().normalize();
-            Path file = batchesFolder.resolve(batchID+"/"+relPath).toAbsolutePath();
+            Path file = batchesFolder.resolve(relPath.replace("%23","#")).toAbsolutePath();
+            System.out.println(file);
             if (file.startsWith(batchesFolder)) {
                 httpServletResponse.setHeader("Content-disposition",
                                               "inline; filename=\"" + file.getFileName().toString() + "\"");
@@ -324,8 +326,18 @@ public class DefaultApiServiceImpl implements DefaultApi {
         }
         
     }
-    
-    
+
+    @Override public List<SlimBatch> getBatchForYearAndMonth(String month, String year) {
+        try {
+            List<SlimBatch> IDs = getDAO().getBatchesFromMonthAndYear(month,year);
+            return IDs;
+        } catch (DAOFailureException e) {
+            log.error("Could not get newspaper IDs from backend");
+            throw handleException(e);
+        }
+    }
+
+
     @Override
     public NewspaperDay getNewspaperDay(String batchID, String newspaperID, String date) {
         try {

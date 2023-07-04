@@ -202,7 +202,8 @@ public class DatabaseRegister extends DecoratedEventHandler {
     }
 
     private boolean matchThisPage(Reference reference, DecoratedParsingEvent event) {
-        return Objects.equals(event.getAvis(), reference.getAvis())
+        return reference != null
+               && Objects.equals(event.getAvis(), reference.getAvis())
                && Objects.equals(event.getEditionDate().toString(),
                                  reference.getEditionDate())
                && Objects.equals(event.getUdgave(), reference.getUdgave())
@@ -277,68 +278,68 @@ public class DatabaseRegister extends DecoratedEventHandler {
         }
     }
 
-    @Override
-    public void newspaperFolder(DecoratedNodeParsingEvent event,
-                                String avis) throws IOException {
-        File path = new File(event.getLocation());
-        File[] newspapers = path.listFiles((dir, name) -> new File(dir, name).isDirectory());
-        if (newspapers != null) {
-            for (File newspaper : newspapers) {
-                File[] files = newspaper.listFiles((dir, name) -> new File(dir, name).isDirectory());
-                assert files != null;
-                long newspaperSize = files[0].length();
-                DayOfWeek dayOfWeek = DayOfWeek.from(event.getEditionDate());
-                if (newspaperSize > 0) {
-
-                    int[] daysOfWeek = {0, 0, 0, 0, 0, 0, 0};
-                    daysOfWeek[dayOfWeek.getValue() - 1] += 1;
-                    try (Connection connection = dataSource.getConnection()) {
-
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                                """
-                                INSERT INTO deliverypattern (avisid,monday,tuesday,wednesday,thursday,friday,saturday,sunday,batchcount) 
-                                VALUES(?,?,?,?,?,?,?,?,1)
-                                ON CONFLICT (avisid) 
-                                DO 
-                                UPDATE  
-                                SET monday = deliverypattern.monday + ?,tuesday = deliverypattern.tuesday + ?, wednesday = deliverypattern.wednesday + ?, thursday = deliverypattern.thursday + ?, friday = deliverypattern.friday + ?, saturday = deliverypattern.saturday + ?, sunday = deliverypattern.sunday +?, batchcount = deliverypattern.batchcount + 1
-                                WHERE deliverypattern.avisid = ?
-                                """)) {
-                            int param = 1;
-                            //orig_relpath
-                            preparedStatement.setString(param++, newspaper.getName());
-                            for (int j : daysOfWeek) {
-                                preparedStatement.setInt(param++, j);
-                            }
-
-                            for (int j : daysOfWeek) {
-                                preparedStatement.setInt(param++, j);
-                            }
-                            preparedStatement.setString(param++, newspaper.getName());
-                            preparedStatement.execute();
-
-                        }
-                        connection.commit();
-                        checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, true);
-                    } catch (SQLException e) {
-                        throw new IOException("Failure in registering page " +
-                                              event +
-                                              " for batch " +
-                                              newspaper.getName(), e);
-                    }
-
-
-                } else {
-                    checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, false);
-                }
-            }
-
-
-        }
-        checkExpectedDeliveries(event, newspapers);
-
-
-    }
+//    @Override
+//    public void newspaperFolder(DecoratedNodeParsingEvent event,
+//                                String avis) throws IOException {
+//        File path = new File(event.getLocation());
+//        File[] newspapers = path.listFiles((dir, name) -> new File(dir, name).isDirectory());
+//        if (newspapers != null) {
+//            for (File newspaper : newspapers) {
+//                File[] files = newspaper.listFiles((dir, name) -> new File(dir, name).isDirectory());
+//                assert files != null;
+//                long newspaperSize = files[0].length();
+//                DayOfWeek dayOfWeek = DayOfWeek.from(event.getEditionDate());
+//                if (newspaperSize > 0) {
+//
+//                    int[] daysOfWeek = {0, 0, 0, 0, 0, 0, 0};
+//                    daysOfWeek[dayOfWeek.getValue() - 1] += 1;
+//                    try (Connection connection = dataSource.getConnection()) {
+//
+//                        try (PreparedStatement preparedStatement = connection.prepareStatement(
+//                                """
+//                                INSERT INTO deliverypattern (avisid,monday,tuesday,wednesday,thursday,friday,saturday,sunday,batchcount)
+//                                VALUES(?,?,?,?,?,?,?,?,1)
+//                                ON CONFLICT (avisid)
+//                                DO
+//                                UPDATE
+//                                SET monday = deliverypattern.monday + ?,tuesday = deliverypattern.tuesday + ?, wednesday = deliverypattern.wednesday + ?, thursday = deliverypattern.thursday + ?, friday = deliverypattern.friday + ?, saturday = deliverypattern.saturday + ?, sunday = deliverypattern.sunday +?, batchcount = deliverypattern.batchcount + 1
+//                                WHERE deliverypattern.avisid = ?
+//                                """)) {
+//                            int param = 1;
+//                            //orig_relpath
+//                            preparedStatement.setString(param++, newspaper.getName());
+//                            for (int j : daysOfWeek) {
+//                                preparedStatement.setInt(param++, j);
+//                            }
+//
+//                            for (int j : daysOfWeek) {
+//                                preparedStatement.setInt(param++, j);
+//                            }
+//                            preparedStatement.setString(param++, newspaper.getName());
+//                            preparedStatement.execute();
+//
+//                        }
+//                        connection.commit();
+//                        checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, true);
+//                    } catch (SQLException e) {
+//                        throw new IOException("Failure in registering page " +
+//                                              event +
+//                                              " for batch " +
+//                                              newspaper.getName(), e);
+//                    }
+//
+//
+//                } else {
+//                    checkDeliveryFrequency(event, newspaper.getName(), dayOfWeek, false);
+//                }
+//            }
+//
+//
+//        }
+//        checkExpectedDeliveries(event, newspapers);
+//
+//
+//    }
 
     private void checkDeliveryFrequency(DecoratedNodeParsingEvent event,
                                         String newspaper, DayOfWeek date, Boolean hasPages) {

@@ -166,8 +166,17 @@ body {
 }
 #primary-show{
   margin-bottom: 0.5em;
-}
+  display: flex;
 
+}
+#PDFview{
+  margin:auto;
+}
+.pdfFrontPages{
+  height: 27em;
+  width: 22em;
+  display: inline-block;
+}
 
 .bootstrap-table .fixed-table-container .fixed-table-body{
   /*Override bootstrap tables as it seems to make the page WAY too long*/
@@ -183,6 +192,8 @@ body {
 }
 .form-row{
   font-family: sans-serif;
+  margin-left: 0;
+  margin-right: 0;
 }
 .form-row button{
   margin-left: 1px;
@@ -194,9 +205,114 @@ body {
   padding: 0;
 }
 .noteContainer{
-  max-height: 40em;
+  max-height: 10em;
   overflow-x:hidden;
 }
 .noteContainer *{
   margin-left: 1px;
+}
+#pageNumberTable{
+  max-height: 10em;
+  overflow: scroll;
+  overflow-y: auto;
+}
+.table-responsive{
+  max-height: 30em;
+}
+table thead th {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background: #fafafa;
+}
+/* safari and ios need the tfoot itself to be position:sticky also */
+table tfoot,
+table tfoot th,
+table tfoot td {
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  z-index:4;
+  background: #fafafa;
+}
+.infoCol{
+  max-width: 100%;
+  flex: none;
+}
+.frontPagesBtn{
+  width: 92%;
+}
+#zoomedFrontpage {
+  display: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+.pdfFrontpage{
+  transition: transform .2s;
+}
+.pdfFrontpage:hover{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0%;
+}
+#tableRowHighlight{
+  background-color: rgba(253, 197, 60, 0.36);
+}
+
+#contentCol{
+  background-color:#ffe5c475;
+}
+#contentCol > .row{
+  margin-bottom: 2em;
+  margin-left: 1px;
+}
+.tooltipDiv {
+  position: relative;
+  display: flex;
+  place-content: center;
+}
+.tooltip{
+  position: absolute;
+  top: -6em;
+  z-index: 1;
+  background: #00732c;
+  padding: 8px;
+  font-size: 1rem;
+  color: #fff;
+  border-radius: 2px;
+  animation: fadeIn 0.3s;
+  animation-fill-mode: forwards;
+}
+.tooltip:before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  border: 8px solid transparent;
+  border-top: 8px solid #00732c;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.monthlyCalendar{
+  width: 100%;
+}
+.monthlyCalendar > div > div > .month{
+  width: 100%;
+}
+.monthlyCalendar>div>div>.month>tr>td>.day-content{
+  height: 3em;
+  font-size: large;
+  font-weight: bold;
+  text-align: center;
 }

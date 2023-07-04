@@ -53,7 +53,7 @@ public class AvisScanQATool {
                     = new BasicRunnableComponent(r -> List.of(new FileNamingChecker(r)), checksumFile, filesToIgnore);
 
             basicRunnableComponent.doWorkOnItem(batch, resultCollector);
-
+            resultCollector.setSuccess(true);
         } catch (Exception e) {
             resultCollector.addExceptionalFailure(e);
         }

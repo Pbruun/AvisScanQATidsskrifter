@@ -9,12 +9,12 @@
 #
 #
 avischk-web-qa:
-  jdbc-connection-string: "jdbc:postgresql://localhost:5432/AvisScanQATidsskrifter"
+  jdbc-connection-string: "jdbc:postgresql://localhost:5432/postgres"
   jdbc-user: "pabr"
   jdbc-password: "DO NOT SET HERE"
   jdbc-driver: "org.postgresql.Driver"
 
-  batchesFolder: "/home/pabr/Projects/AvisScanQATidsskrifter/AvisScanQATidsskrifter/data"
+  batchesFolder: "/home/pabr/workflowTestcases/QA/batckup/test"
 
   predefinedNotes:
     dayNotes:

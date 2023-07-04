@@ -14,22 +14,22 @@ public class Main {
 
     public static final String IGNORED_FILES_DEFAULT_VALUE = "transfer_complete,transfer_acknowledged,delete_ok";
 
-    public static void main(File... args) throws IOException, URISyntaxException {
+    public static void main(String... args) throws IOException, URISyntaxException {
 
         File configFolder = new File(Thread.currentThread()
                                            .getContextClassLoader()
                                            .getResource("AvisScanQA_cli-behaviour.yaml")
                                            .toURI()).getParentFile();
         YAML config = YAML.resolveLayeredConfigs(configFolder.getAbsolutePath() + "/AvisScanQA_cli-*.yaml");
-
+        System.out.println();
         AvisScanQATool tool = new AvisScanQATool(config,
                                                  config.getString("iterator.checksumFile"),
                                                  config.getString("iterator.acknowledgmentFile"),
                                                  config.getList("iterator.filesToIgnore"));
         List<ResultCollector> resultCollector = new ArrayList<>();
-        for (File f :args
+        for (String f :args
              ) {
-            resultCollector.add(tool.check(Path.of(f.toString()).toAbsolutePath()));
+            resultCollector.add(tool.check(Path.of(f).toAbsolutePath()));
 
         }
 

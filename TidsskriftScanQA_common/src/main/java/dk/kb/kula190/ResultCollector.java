@@ -118,7 +118,7 @@ public class ResultCollector {
      *
      * @param success the sucesss
      */
-    private void setSuccess(boolean success) {
+    public void setSuccess(boolean success) {
         resultStructure.setOutcome(success ? "Success" : "Failure");
     }
     
